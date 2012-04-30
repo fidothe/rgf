@@ -18,3 +18,7 @@ assert first_example.has_been_run
 second_example = Example("runs before method from context", first_test_function, MockExampleGroup())
 second_example.run()
 assert second_example.before_was_run
+
+# Successful example reports its success
+third_example = Example("reports success", first_test_function, MockExampleGroup())
+assert (1, None) == third_example.run()

@@ -7,3 +7,4 @@ class Example(object):
     def run(self):
         self.example_group.run_before_each(self)
         self.spec_function(self)
+        return (1, None)
