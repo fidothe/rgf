@@ -6,5 +6,8 @@ class Example(object):
 
     def run(self):
         self.example_group.run_before_each(self)
-        self.spec_function(self)
-        return (1, None)
+        try:
+            self.spec_function(self)
+            return (1, None)
+        except Exception as e:
+            return (3, e)

@@ -22,3 +22,11 @@ assert second_example.before_was_run
 # Successful example reports its success
 third_example = Example("reports success", first_test_function, MockExampleGroup())
 assert (1, None) == third_example.run()
+
+# Exploded example reports its error
+an_error = StandardError("An Error")
+def bad_test_function(self):
+    raise an_error
+
+third_example = Example("reports error", bad_test_function, MockExampleGroup())
+assert (3, an_error) == third_example.run()
