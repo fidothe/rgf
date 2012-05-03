@@ -30,3 +30,12 @@ def bad_test_function(self):
 
 third_example = Example("reports error", bad_test_function, MockExampleGroup())
 assert (3, an_error) == third_example.run()
+
+# Failed example reports its error
+def failed_test_function(self):
+    assert False
+
+fourth_example = Example("reports failure", failed_test_function, MockExampleGroup())
+result = fourth_example.run()
+assert result[0] == 2
+assert type(result[-1]) == AssertionError

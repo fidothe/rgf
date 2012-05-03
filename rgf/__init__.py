@@ -9,5 +9,7 @@ class Example(object):
         try:
             self.spec_function(self)
             return (1, None)
+        except AssertionError as e:
+            return (2, e)
         except Exception as e:
             return (3, e)
