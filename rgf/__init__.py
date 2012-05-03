@@ -13,3 +13,16 @@ class Example(object):
             return (2, e)
         except Exception as e:
             return (3, e)
+
+class ExampleGroup(object):
+    def __init__(self):
+        self.examples = []
+
+    def add_example(self, example):
+        self.examples.append(example)
+
+    def run(self):
+        [example.run() for example in self.examples]
+
+    def run_before_each(self, example):
+        pass

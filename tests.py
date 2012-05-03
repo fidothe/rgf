@@ -1,4 +1,4 @@
-from rgf import Example
+from rgf import Example, ExampleGroup
 
 class MockExampleGroup(object):
     def run_before_each(self, example):
@@ -39,3 +39,12 @@ fourth_example = Example("reports failure", failed_test_function, MockExampleGro
 result = fourth_example.run()
 assert result[0] == 2
 assert type(result[-1]) == AssertionError
+
+# Examples can be grouped and run together
+eg = ExampleGroup()
+eg.add_example(Example('All good', first_test_function, eg))
+eg.add_example(Example('Still good', first_test_function, eg))
+eg.run()
+
+assert eg.examples[0].has_been_run
+assert eg.examples[1].has_been_run
