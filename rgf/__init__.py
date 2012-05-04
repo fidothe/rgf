@@ -15,6 +15,14 @@ class Example(object):
             return (3, e)
 
 class ExampleGroup(object):
+    @classmethod
+    def set_current_example_group(self, example_group):
+        self.current_example_group = example_group
+
+    @classmethod
+    def get_current_example_group(self):
+        return self.current_example_group
+
     def __init__(self):
         self.examples = []
         self.before_function = None
