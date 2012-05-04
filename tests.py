@@ -1,4 +1,4 @@
-from rgf import Example, ExampleGroup
+from rgf import Example, ExampleGroup, describe
 
 class MockExampleGroup(object):
     def run_before_each(self, example):
@@ -71,3 +71,8 @@ eg = ExampleGroup("")
 ExampleGroup.set_current_example_group(eg)
 
 assert ExampleGroup.get_current_example_group() is eg
+
+# provide describe helper context to create and set current ExampleGroup
+eg = describe('This Example Group')
+assert ExampleGroup.get_current_example_group() is eg
+

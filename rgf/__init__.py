@@ -40,3 +40,8 @@ class ExampleGroup(object):
     def run_before_each(self, example):
         if self.before_function:
             self.before_function(example)
+
+def describe(description):
+    example_group = ExampleGroup(description)
+    ExampleGroup.set_current_example_group(example_group)
+    return example_group
