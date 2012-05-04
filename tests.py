@@ -48,3 +48,18 @@ eg.run()
 
 assert eg.examples[0].has_been_run
 assert eg.examples[1].has_been_run
+
+# ExampleGroups can have setup code to be run before examples added
+def before_func(world):
+    world.before_was_run = True
+
+eg = ExampleGroup()
+eg.add_example(Example('All good', first_test_function, eg))
+eg.add_example(Example('Still good', first_test_function, eg))
+eg.add_before(before_func)
+eg.run()
+
+assert eg.examples[0].before_was_run
+assert eg.examples[1].before_was_run
+
+
