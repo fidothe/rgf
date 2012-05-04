@@ -23,8 +23,9 @@ class ExampleGroup(object):
     def get_current_example_group(self):
         return self.current_example_group
 
-    def __init__(self):
+    def __init__(self, description):
         self.examples = []
+        self.description = description
         self.before_function = None
 
     def add_example(self, example):
