@@ -53,3 +53,9 @@ def it(description):
         example_group.add_example(example)
         return example
     return example_creator
+
+def before():
+    def before_wrapper(before_function):
+        example_group = ExampleGroup.get_current_example_group()
+        example_group.add_before(before_function)
+    return before_wrapper

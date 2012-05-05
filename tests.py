@@ -1,4 +1,4 @@
-from rgf import Example, ExampleGroup, describe, it
+from rgf import Example, ExampleGroup, describe, it, before
 
 class MockExampleGroup(object):
     def run_before_each(self, example):
@@ -82,3 +82,9 @@ decorator = it('Example description created by it()')
 example = decorator(first_test_function)
 assert example.description == 'Example description created by it()'
 assert eg.examples == [example]
+
+# provide before() decorator creator. The decorator adds a function to the current ExampleGroup's before runner
+eg = describe('Example Group with before function')
+decorator = before()
+decorator(before_func)
+assert eg.before_function is before_func
