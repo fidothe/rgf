@@ -1,4 +1,4 @@
-from rgf import Example, ExampleGroup, describe
+from rgf import Example, ExampleGroup, describe, it
 
 class MockExampleGroup(object):
     def run_before_each(self, example):
@@ -76,3 +76,9 @@ assert ExampleGroup.get_current_example_group() is eg
 eg = describe('This Example Group')
 assert ExampleGroup.get_current_example_group() is eg
 
+# provide it() decorator creator. The decorator creates Examples on the current ExampleGroup
+eg = describe('Example Group with examples added by it()')
+decorator = it('Example description created by it()')
+example = decorator(first_test_function)
+assert example.description == 'Example description created by it()'
+assert eg.examples == [example]

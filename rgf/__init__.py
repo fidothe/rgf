@@ -45,3 +45,11 @@ def describe(description):
     example_group = ExampleGroup(description)
     ExampleGroup.set_current_example_group(example_group)
     return example_group
+
+def it(description):
+    def example_creator(spec_function):
+        example_group = ExampleGroup.get_current_example_group()
+        example = Example(description, spec_function, example_group)
+        example_group.add_example(example)
+        return example
+    return example_creator
