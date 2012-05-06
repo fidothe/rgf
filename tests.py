@@ -1,4 +1,4 @@
-from rgf import Example, ExampleGroup, describe, it, before
+from rgf import Example, ExampleGroup, ExampleSuite, describe, it, before
 
 class MockExampleGroup(object):
     def run_before_each(self, example):
@@ -89,5 +89,10 @@ decorator = before()
 decorator(before_func)
 assert eg.before_function is before_func
 
-# ExampleGroups should be added to an ExampleSuite which collects all of them.
+# ExampleSuite can collect many ExampleGroups
+suite = ExampleSuite()
+example_group = suite.add_example_group('ExampleGroup description')
+assert type(example_group) is ExampleGroup
+assert example_group in suite.example_groups
+
 

@@ -40,6 +40,15 @@ class ExampleGroup(object):
         if self.before_function:
             self.before_function(example)
 
+class ExampleSuite(object):
+    def __init__(self):
+        self.example_groups = []
+
+    def add_example_group(self, description):
+        example_group = ExampleGroup(description)
+        self.example_groups.append(example_group)
+        return example_group
+
 def describe(description):
     example_group = ExampleGroup(description)
     ExampleGroup.set_current_example_group(example_group)
