@@ -126,3 +126,9 @@ assert example_group.__enter__() is example_group
 assert example_suite.get_current_example_group() is example_group
 
 # An ExampleGroup responds to the context manage __exit__ API call and removes itself as the current example group
+example_suite = ExampleSuite()
+example_group = ExampleGroup(example_suite, '__exit__ group')
+example_suite.set_current_example_group(example_group)
+example_group.__exit__(None, None, None)
+assert example_suite.get_current_example_group() is example_suite
+

@@ -45,6 +45,9 @@ class ExampleGroup(object):
         self.parent.set_current_example_group(self)
         return self
 
+    def __exit__(self, cls, value, traceback):
+        self.parent.pop_current_example_group()
+
 class ExampleSuite(object):
     @classmethod
     def get_suite(cls):
