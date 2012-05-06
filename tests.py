@@ -69,12 +69,6 @@ eg.run()
 assert eg.examples[0].before_was_run
 assert eg.examples[1].before_was_run
 
-# ExampleGroup class provides a naive way to register an ExampleGroup instance as the 'current' example group
-eg = ExampleGroup(MockExampleSuite(), '')
-ExampleGroup.set_current_example_group(eg)
-
-assert ExampleGroup.get_current_example_group() is eg
-
 # ExampleSuite can collect many ExampleGroups
 suite = ExampleSuite()
 example_group = suite.add_example_group('ExampleGroup description')

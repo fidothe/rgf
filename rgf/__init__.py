@@ -14,14 +14,6 @@ class Example(object):
             return (3, e)
 
 class ExampleGroup(object):
-    @classmethod
-    def set_current_example_group(cls, example_group):
-        cls.current_example_group = example_group
-
-    @classmethod
-    def get_current_example_group(cls):
-        return cls.current_example_group
-
     def __init__(self, parent, description):
         self.parent = parent
         self.examples = []
