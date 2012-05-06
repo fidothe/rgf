@@ -41,6 +41,10 @@ class ExampleGroup(object):
         if self.before_function:
             self.before_function(example)
 
+    def __enter__(self):
+        self.parent.set_current_example_group(self)
+        return self
+
 class ExampleSuite(object):
     @classmethod
     def get_suite(cls):
