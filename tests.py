@@ -10,33 +10,33 @@ class MockExampleGroup(object):
 def first_test_function(self):
     self.has_been_run = True
 
-first_example = Example("can be run", first_test_function, MockExampleGroup())
-first_example.run()
+first_example = Example("can be run", first_test_function)
+first_example.run(MockExampleGroup())
 assert first_example.has_been_run
 
 # Example is run with before func from context
-second_example = Example("runs before method from context", first_test_function, MockExampleGroup())
-second_example.run()
+second_example = Example("runs before method from context", first_test_function)
+second_example.run(MockExampleGroup())
 assert second_example.before_was_run
 
 # Successful example reports its success
-third_example = Example("reports success", first_test_function, MockExampleGroup())
-assert (1, None) == third_example.run()
+third_example = Example("reports success", first_test_function)
+assert (1, None) == third_example.run(MockExampleGroup())
 
 # Exploded example reports its error
 an_error = StandardError("An Error")
 def bad_test_function(self):
     raise an_error
 
-third_example = Example("reports error", bad_test_function, MockExampleGroup())
-assert (3, an_error) == third_example.run()
+third_example = Example("reports error", bad_test_function)
+assert (3, an_error) == third_example.run(MockExampleGroup())
 
 # Failed example reports its error
 def failed_test_function(self):
     assert False
 
-fourth_example = Example("reports failure", failed_test_function, MockExampleGroup())
-result = fourth_example.run()
+fourth_example = Example("reports failure", failed_test_function)
+result = fourth_example.run(MockExampleGroup())
 assert result[0] == 2
 assert type(result[-1]) == AssertionError
 
@@ -46,8 +46,8 @@ assert eg.description == "A group of Examples"
 
 # Examples can be grouped and run together
 eg = ExampleGroup("")
-eg.add_example(Example('All good', first_test_function, eg))
-eg.add_example(Example('Still good', first_test_function, eg))
+eg.add_example(Example('All good', first_test_function))
+eg.add_example(Example('Still good', first_test_function))
 eg.run()
 
 assert eg.examples[0].has_been_run
@@ -58,8 +58,8 @@ def before_func(world):
     world.before_was_run = True
 
 eg = ExampleGroup("")
-eg.add_example(Example('All good', first_test_function, eg))
-eg.add_example(Example('Still good', first_test_function, eg))
+eg.add_example(Example('All good', first_test_function))
+eg.add_example(Example('Still good', first_test_function))
 eg.add_before(before_func)
 eg.run()
 
@@ -88,3 +88,6 @@ eg = describe('Example Group with before function')
 decorator = before()
 decorator(before_func)
 assert eg.before_function is before_func
+
+# ExampleGroups should be added to an ExampleSuite which collects all of them.
+
