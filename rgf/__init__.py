@@ -41,6 +41,12 @@ class ExampleGroup(object):
             self.before_function(example)
 
 class ExampleSuite(object):
+    @classmethod
+    def get_suite(cls):
+        if hasattr(cls, 'example_suite'): return cls.example_suite
+        cls.example_suite = ExampleSuite()
+        return cls.example_suite
+
     def __init__(self):
         self.example_groups = []
         self.current_example_group = None

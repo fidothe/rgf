@@ -105,5 +105,9 @@ example_group = suite.add_example_group('ExampleGroup description')
 suite.set_current_example_group(example_group)
 assert suite.get_current_example_group() is example_group
 
+# ExampleSuite can create and return a single instance of itself
+assert type(ExampleSuite.get_suite()) is ExampleSuite
+assert ExampleSuite.get_suite() is ExampleSuite.get_suite()
+
 # An ExampleGroup responds to the context mangaer __enter__ API call and sets itself as the current example group in the suite
 # An ExampleGroup responds to the context manage __exit__ API call and removes itself as the current example group
