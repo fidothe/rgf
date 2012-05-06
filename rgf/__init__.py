@@ -22,7 +22,8 @@ class ExampleGroup(object):
     def get_current_example_group(cls):
         return cls.current_example_group
 
-    def __init__(self, description):
+    def __init__(self, parent, description):
+        self.parent = parent
         self.examples = []
         self.description = description
         self.before_function = None
@@ -52,7 +53,7 @@ class ExampleSuite(object):
         self.current_example_group = None
 
     def add_example_group(self, description):
-        example_group = ExampleGroup(description)
+        example_group = ExampleGroup(self, description)
         self.example_groups.append(example_group)
         return example_group
 
@@ -64,7 +65,7 @@ class ExampleSuite(object):
         return self.current_example_group
 
 def describe(description):
-    example_group = ExampleGroup(description)
+    example_group = ExampleGroup(ExampleSuite.get_suite(), description)
     ExampleGroup.set_current_example_group(example_group)
     return example_group
 

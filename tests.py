@@ -6,6 +6,9 @@ class MockExampleGroup(object):
             eg.before_was_run = True
         before(example)
 
+class MockExampleSuite(object):
+    pass
+
 # Example can be run
 def first_test_function(self):
     self.has_been_run = True
@@ -41,11 +44,11 @@ assert result[0] == 2
 assert type(result[-1]) == AssertionError
 
 # ExampleGroups can be created and described
-eg = ExampleGroup("A group of Examples")
+eg = ExampleGroup(MockExampleSuite(), "A group of Examples")
 assert eg.description == "A group of Examples"
 
 # Examples can be grouped and run together
-eg = ExampleGroup("")
+eg = ExampleGroup(MockExampleSuite(), "")
 eg.add_example(Example('All good', first_test_function))
 eg.add_example(Example('Still good', first_test_function))
 eg.run()
@@ -57,7 +60,7 @@ assert eg.examples[1].has_been_run
 def before_func(world):
     world.before_was_run = True
 
-eg = ExampleGroup("")
+eg = ExampleGroup(MockExampleSuite(), '')
 eg.add_example(Example('All good', first_test_function))
 eg.add_example(Example('Still good', first_test_function))
 eg.add_before(before_func)
@@ -67,7 +70,7 @@ assert eg.examples[0].before_was_run
 assert eg.examples[1].before_was_run
 
 # ExampleGroup class provides a naive way to register an ExampleGroup instance as the 'current' example group
-eg = ExampleGroup("")
+eg = ExampleGroup(MockExampleSuite(), '')
 ExampleGroup.set_current_example_group(eg)
 
 assert ExampleGroup.get_current_example_group() is eg
