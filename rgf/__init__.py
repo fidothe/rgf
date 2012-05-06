@@ -54,7 +54,7 @@ class ExampleSuite(object):
 
     def __init__(self):
         self.example_groups = []
-        self.current_example_group = None
+        self.current_example_group_stack = [self]
 
     def add_example_group(self, description):
         example_group = ExampleGroup(self, description)
@@ -62,11 +62,13 @@ class ExampleSuite(object):
         return example_group
 
     def set_current_example_group(self, example_group):
-        self.current_example_group = example_group
+        self.current_example_group_stack.append(example_group)
 
     def get_current_example_group(self):
-        if self.current_example_group is None: return self
-        return self.current_example_group
+        return self.current_example_group_stack[-1]
+
+    def pop_current_example_group(self):
+        self.current_example_group_stack.pop()
 
 def describe(description):
     example_group = ExampleGroup(ExampleSuite.get_suite(), description)

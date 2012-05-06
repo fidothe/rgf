@@ -108,6 +108,13 @@ example_group = suite.add_example_group('ExampleGroup description')
 suite.set_current_example_group(example_group)
 assert suite.get_current_example_group() is example_group
 
+# ExampleSuite allows the current ExampleGroup to be popped off
+suite = ExampleSuite()
+example_group = suite.add_example_group('ExampleGroup description')
+suite.set_current_example_group(example_group)
+suite.pop_current_example_group()
+assert suite.get_current_example_group() is suite
+
 # ExampleSuite can create and return a single instance of itself
 assert type(ExampleSuite.get_suite()) is ExampleSuite
 assert ExampleSuite.get_suite() is ExampleSuite.get_suite()
