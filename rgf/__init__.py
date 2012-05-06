@@ -43,11 +43,19 @@ class ExampleGroup(object):
 class ExampleSuite(object):
     def __init__(self):
         self.example_groups = []
+        self.current_example_group = None
 
     def add_example_group(self, description):
         example_group = ExampleGroup(description)
         self.example_groups.append(example_group)
         return example_group
+
+    def set_current_example_group(self, example_group):
+        self.current_example_group = example_group
+
+    def get_current_example_group(self):
+        if self.current_example_group is None: return self
+        return self.current_example_group
 
 def describe(description):
     example_group = ExampleGroup(description)

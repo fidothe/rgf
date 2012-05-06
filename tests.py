@@ -95,4 +95,15 @@ example_group = suite.add_example_group('ExampleGroup description')
 assert type(example_group) is ExampleGroup
 assert example_group in suite.example_groups
 
+# ExampleSuite returns itself as the current ExampleGroup if there is none.
+suite = ExampleSuite()
+assert suite.get_current_example_group() is suite
 
+# ExampleSuite allows the current ExampleGroup to be set
+suite = ExampleSuite()
+example_group = suite.add_example_group('ExampleGroup description')
+suite.set_current_example_group(example_group)
+assert suite.get_current_example_group() is example_group
+
+# An ExampleGroup responds to the context mangaer __enter__ API call and sets itself as the current example group in the suite
+# An ExampleGroup responds to the context manage __exit__ API call and removes itself as the current example group
