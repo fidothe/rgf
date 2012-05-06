@@ -73,14 +73,16 @@ class ExampleSuite(object):
     def pop_current_example_group(self):
         self.current_example_group_stack.pop()
 
+def _get_current_example_group():
+    return ExampleSuite.get_suite().get_current_example_group()
+
 def describe(description):
-    example_group = ExampleGroup(ExampleSuite.get_suite(), description)
-    ExampleGroup.set_current_example_group(example_group)
-    return example_group
+    new_example_group = _get_current_example_group().add_example_group(description)
+    return new_example_group
 
 def it(description):
     def example_creator(spec_function):
-        example_group = ExampleGroup.get_current_example_group()
+        example_group = _get_current_example_group()
         example = Example(description, spec_function)
         example_group.add_example(example)
         return example
@@ -88,6 +90,6 @@ def it(description):
 
 def before():
     def before_wrapper(before_function):
-        example_group = ExampleGroup.get_current_example_group()
+        example_group = _get_current_example_group()
         example_group.add_before(before_function)
     return before_wrapper

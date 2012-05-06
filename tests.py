@@ -75,23 +75,6 @@ ExampleGroup.set_current_example_group(eg)
 
 assert ExampleGroup.get_current_example_group() is eg
 
-# provide describe helper context to create and set current ExampleGroup
-eg = describe('This Example Group')
-assert ExampleGroup.get_current_example_group() is eg
-
-# provide it() decorator creator. The decorator creates Examples on the current ExampleGroup
-eg = describe('Example Group with examples added by it()')
-decorator = it('Example description created by it()')
-example = decorator(first_test_function)
-assert example.description == 'Example description created by it()'
-assert eg.examples == [example]
-
-# provide before() decorator creator. The decorator adds a function to the current ExampleGroup's before runner
-eg = describe('Example Group with before function')
-decorator = before()
-decorator(before_func)
-assert eg.before_function is before_func
-
 # ExampleSuite can collect many ExampleGroups
 suite = ExampleSuite()
 example_group = suite.add_example_group('ExampleGroup description')
@@ -132,3 +115,19 @@ example_suite.set_current_example_group(example_group)
 example_group.__exit__(None, None, None)
 assert example_suite.get_current_example_group() is example_suite
 
+# provide describe helper context to create and set current ExampleGroup
+eg = describe('This Example Group')
+assert type(eg) is ExampleGroup
+
+# provide it() decorator creator. The decorator creates Examples on the current ExampleGroup
+with describe('Example Group with examples added by it()') as eg:
+    decorator = it('Example description created by it()')
+    example = decorator(first_test_function)
+    assert example.description == 'Example description created by it()'
+    assert eg.examples == [example]
+
+# provide before() decorator creator. The decorator adds a function to the current ExampleGroup's before runner
+with describe('Example Group with before function') as eg:
+    decorator = before()
+    decorator(before_func)
+    assert eg.before_function is before_func
