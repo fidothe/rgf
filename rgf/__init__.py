@@ -1,3 +1,5 @@
+import sys
+
 class Example(object):
     def __init__(self, description, spec_function):
         self.spec_function = spec_function
@@ -7,11 +9,13 @@ class Example(object):
         example_group.run_before_each(self)
         try:
             self.spec_function(self)
-            return (1, None)
-        except AssertionError as e:
-            return (2, e)
+            return ExampleResult(1, None, None)
+        except AssertionError:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            return ExampleResult(2, exc_value, exc_traceback)
         except Exception as e:
-            return (3, e)
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            return ExampleResult(3, exc_value, exc_traceback)
 
 class ExampleGroup(object):
     def __init__(self, parent, description):
@@ -93,6 +97,12 @@ def before(example_group = None):
         example_group.add_before(before_function)
     return before_wrapper
 
+class ExampleResult(object):
+    def __init__(self, kind, exception = None, traceback = None):
+        self.kind = kind
+        self.exception = exception
+        self.traceback = traceback
+
 class ProgressFormatter(object):
     output_map = {1: '.', 2: 'F', 3: 'E'}
 
@@ -106,13 +116,13 @@ class ProgressFormatter(object):
         self.io.write(line)
         self.io.write('\n')
 
-    def success(self, example, example_finish_status):
+    def success(self, example, example_result):
         self.write_status('.')
 
-    def failure(self, example, example_finish_status):
+    def failure(self, example, example_result):
         self.write_status('F')
 
-    def error(self, example, example_finish_status):
+    def error(self, example, example_result):
         self.write_status('E')
 
     def summarise_results(self, total, successes, failures, errors):

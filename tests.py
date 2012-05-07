@@ -1,5 +1,5 @@
 import StringIO
-from rgf import Example, ExampleGroup, ExampleSuite, describe, it, before, ProgressFormatter
+from rgf import Example, ExampleGroup, ExampleSuite, describe, it, before, ProgressFormatter, ExampleResult
 
 class MockExampleGroup(object):
     def run_before_each(self, example):
@@ -28,7 +28,10 @@ assert second_example.before_was_run
 
 # Successful example reports its success
 third_example = Example("reports success", first_test_function)
-assert (1, None) == third_example.run(MockExampleGroup())
+result = third_example.run(MockExampleGroup())
+assert type(result) == ExampleResult
+assert result.kind == 1
+assert result.traceback is None
 
 # Exploded example reports its error
 an_error = StandardError("An Error")
@@ -36,7 +39,11 @@ def bad_test_function(self):
     raise an_error
 
 third_example = Example("reports error", bad_test_function)
-assert (3, an_error) == third_example.run(MockExampleGroup())
+result = third_example.run(MockExampleGroup())
+assert type(result) == ExampleResult
+assert result.exception is an_error
+assert result.traceback is not None
+assert result.kind == 3
 
 # Failed example reports its error
 def failed_test_function(self):
@@ -44,8 +51,10 @@ def failed_test_function(self):
 
 fourth_example = Example("reports failure", failed_test_function)
 result = fourth_example.run(MockExampleGroup())
-assert result[0] == 2
-assert type(result[-1]) == AssertionError
+assert type(result) == ExampleResult
+assert type(result.exception) is AssertionError
+assert result.traceback is not None
+assert result.kind == 2
 
 # ExampleGroups can be created and described
 eg = ExampleGroup(MockExampleSuite(), "A group of Examples")
