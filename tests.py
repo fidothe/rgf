@@ -133,14 +133,14 @@ with describe('ExampleGroup with hard-wired parent', parent = example_suite) as 
 
 # it decorator allows the ExampleGroup to be specified
 example_suite = ExampleSuite()
-example_group = ExampleGroup(example_suite, 'eg for explicit passing to it decorator')
+example_group = ExampleGroup(example_suite, 'eg for explicit passing to it() decorator')
 decorator = it('has explicit ExampleGroup', example_group = example_group)
 example = decorator(first_test_function)
 assert example_group.examples == [example]
 
 # before decorator allows the ExampleGroup to be set
 example_suite = ExampleSuite()
-example_group = ExampleGroup(example_suite, 'eg for explicit passing to it decorator')
+example_group = ExampleGroup(example_suite, 'eg for explicit passing to before() decorator')
 decorator = before(example_group = example_group)
 decorator(before_func)
 assert example_group.before_function is before_func
