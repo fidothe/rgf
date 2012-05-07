@@ -145,3 +145,13 @@ decorator = before(example_group = example_group)
 decorator(before_func)
 assert example_group.before_function is before_func
 
+# ExampleSuite.run() runs all its ExampleGroups
+example_suite = ExampleSuite()
+example_group = example_suite.add_example_group('eg for explicit passing to it decorator')
+example_group.print_run = True
+@it('has explicit ExampleGroup', example_group = example_group)
+def f(world):
+    world.has_been_run = True
+
+example_suite.run()
+assert example_group.examples[0].has_been_run

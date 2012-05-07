@@ -65,6 +65,9 @@ class ExampleSuite(object):
     def pop_current_example_group(self):
         self.current_example_group_stack.pop()
 
+    def run(self):
+        [example_group.run() for example_group in self.example_groups]
+
 def _get_current_example_group():
     return ExampleSuite.get_suite().get_current_example_group()
 
