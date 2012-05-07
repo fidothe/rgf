@@ -104,8 +104,6 @@ class ExampleResult(object):
         self.traceback = traceback
 
 class ProgressFormatter(object):
-    output_map = {1: '.', 2: 'F', 3: 'E'}
-
     def __init__(self, io):
         self.io = io
 
