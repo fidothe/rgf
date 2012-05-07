@@ -250,6 +250,12 @@ assert formatter.successes == [ex1]
 assert formatter.failures == [ex2]
 assert formatter.errors == [ex3]
 
+# Reporter can report statistics
+assert reporter.total_number_of_examples() == 3
+assert reporter.number_of_successes() == 1
+assert reporter.number_of_failures() == 1
+assert reporter.number_of_errors() == 1
+
 # Reporter uses its formatter to report status, summary and tracebacks for a run
 
 # Once we get to this point we can self-host our single-file test run :-)

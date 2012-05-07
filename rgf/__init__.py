@@ -147,12 +147,31 @@ class ProgressFormatter(object):
 class Reporter(object):
     def __init__(self, formatter):
         self.formatter = formatter
+        self.success_count = 0
+        self.failure_count = 0
+        self.error_count = 0
+
     def example_ran(self, example, result):
         if result.kind == ExampleResult.SUCCESS:
+            self.success_count += 1
             self.formatter.success(example, result)
         elif result.kind == ExampleResult.FAILURE:
+            self.failure_count += 1
             self.formatter.failure(example, result)
         elif result.kind == ExampleResult.ERROR:
+            self.error_count += 1
             self.formatter.error(example, result)
         else:
             raise ValueError('Unrecognised Example result kind')
+
+    def total_number_of_examples(self):
+        return self.success_count + self.failure_count + self.error_count
+
+    def number_of_successes(self):
+        return self.success_count
+
+    def number_of_failures(self):
+        return self.failure_count
+
+    def number_of_errors(self):
+        return self.error_count
