@@ -1,4 +1,5 @@
-from rgf import Example, ExampleGroup, ExampleSuite, describe, it, before
+import StringIO
+from rgf import Example, ExampleGroup, ExampleSuite, describe, it, before, ProgressFormatter
 
 class MockExampleGroup(object):
     def run_before_each(self, example):
@@ -7,6 +8,9 @@ class MockExampleGroup(object):
         before(example)
 
 class MockExampleSuite(object):
+    pass
+
+class MockExample(object):
     pass
 
 # Example can be run
@@ -155,3 +159,21 @@ def f(world):
 
 example_suite.run()
 assert example_group.examples[0].has_been_run
+
+# ProgressFormatter can log a success to an IO-like object
+io = StringIO.StringIO()
+pf = ProgressFormatter(io)
+pf.success(MockExample(), (1, None))
+assert io.getvalue() == '.'
+
+# ProgressFormatter can log a failure to an IO-like object
+io = StringIO.StringIO()
+pf = ProgressFormatter(io)
+pf.failure(MockExample(), (2, None))
+assert io.getvalue() == 'F'
+
+# ProgressFormatter can log an error to an IO-like object
+io = StringIO.StringIO()
+pf = ProgressFormatter(io)
+pf.error(MockExample(), (3, None))
+assert io.getvalue() == 'E'

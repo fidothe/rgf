@@ -92,3 +92,21 @@ def before(example_group = None):
     def before_wrapper(before_function):
         example_group.add_before(before_function)
     return before_wrapper
+
+class ProgressFormatter(object):
+    output_map = {1: '.', 2: 'F', 3: 'E'}
+
+    def __init__(self, io):
+        self.io = io
+
+    def write_status(self, status):
+        self.io.write(status)
+
+    def success(self, example, example_finish_status):
+        self.write_status('.')
+
+    def failure(self, example, example_finish_status):
+        self.write_status('F')
+
+    def error(self, example, example_finish_status):
+        self.write_status('E')
