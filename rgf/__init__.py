@@ -73,6 +73,7 @@ class ExampleSuite(object):
 
     def run(self, reporter):
         [example_group.run(reporter) for example_group in self.example_groups]
+        reporter.run_finished()
 
 def _get_current_example_group():
     return ExampleSuite.get_suite().get_current_example_group()

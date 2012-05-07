@@ -17,6 +17,9 @@ class MockReporter(object):
     def example_ran(self, *args):
         pass
 
+    def run_finished(self):
+        self.run_finished_was_called = True
+
 
 class MockFormatter(object):
     def __init__(self):
@@ -275,5 +278,11 @@ assert type(formatter.summarise_failures_called_with[0][1]) == ExampleResult
 assert len(formatter.summarise_errors_called_with) == 1
 assert formatter.summarise_errors_called_with[0][0] == ex3
 assert type(formatter.summarise_errors_called_with[0][1]) == ExampleResult
+
+# ExampleSuite.run() calls Reporter.run_finished() when the run has finished
+example_suite = ExampleSuite()
+reporter = MockReporter()
+example_suite.run(reporter)
+assert reporter.run_finished_was_called
 
 # Once we get to this point we can self-host our single-file test run :-)
