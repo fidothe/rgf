@@ -177,3 +177,16 @@ io = StringIO.StringIO()
 pf = ProgressFormatter(io)
 pf.error(MockExample(), (3, None))
 assert io.getvalue() == 'E'
+
+# ProgressFormatter can summarise the results of running all examples
+io = StringIO.StringIO()
+pf = ProgressFormatter(io)
+pf.summarise_results(total = 3, successes = 1, failures = 1, errors = 1)
+assert io.getvalue() == 'Ran 3 examples: 1 success, 1 failure, 1 error\n'
+
+# ProgressFormatter can summarise failures
+# ProgressFormatter can summarise errors
+
+# Reporter uses its formatter to report status, summary and tracebacks for a run
+
+# Once we get to this point we can self-host our single-file test run :-)

@@ -102,6 +102,10 @@ class ProgressFormatter(object):
     def write_status(self, status):
         self.io.write(status)
 
+    def write_line(self, line):
+        self.io.write(line)
+        self.io.write('\n')
+
     def success(self, example, example_finish_status):
         self.write_status('.')
 
@@ -110,3 +114,6 @@ class ProgressFormatter(object):
 
     def error(self, example, example_finish_status):
         self.write_status('E')
+
+    def summarise_results(self, total, successes, failures, errors):
+        self.write_line('Ran %s examples: %s success, %s failure, %s error' % (total, successes, failures, errors))
