@@ -17,6 +17,7 @@ class MockReporter(object):
     def example_ran(self, *args):
         pass
 
+
 class MockFormatter(object):
     def __init__(self):
         self.successes = []
@@ -31,6 +32,15 @@ class MockFormatter(object):
 
     def error(self, example, result):
         self.errors.append(example)
+
+    def summarise_results(self, *args):
+        self.summarise_results_called_with = args
+
+    def summarise_failures(self, failures):
+        self.summarise_failures_called_with = failures
+
+    def summarise_errors(self, errors):
+        self.summarise_errors_called_with = errors
 
 # Example can be run
 def first_test_function(self):
@@ -257,5 +267,13 @@ assert reporter.number_of_failures() == 1
 assert reporter.number_of_errors() == 1
 
 # Reporter uses its formatter to report status, summary and tracebacks for a run
+reporter.run_finished()
+assert formatter.summarise_results_called_with == (3, 1, 1, 1)
+assert len(formatter.summarise_failures_called_with) == 1
+assert formatter.summarise_failures_called_with[0][0] == ex2
+assert type(formatter.summarise_failures_called_with[0][1]) == ExampleResult
+assert len(formatter.summarise_errors_called_with) == 1
+assert formatter.summarise_errors_called_with[0][0] == ex3
+assert type(formatter.summarise_errors_called_with[0][1]) == ExampleResult
 
 # Once we get to this point we can self-host our single-file test run :-)

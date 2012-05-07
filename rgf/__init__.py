@@ -148,30 +148,38 @@ class Reporter(object):
     def __init__(self, formatter):
         self.formatter = formatter
         self.success_count = 0
-        self.failure_count = 0
-        self.error_count = 0
+        self.failures = []
+        self.errors = []
 
     def example_ran(self, example, result):
         if result.kind == ExampleResult.SUCCESS:
             self.success_count += 1
             self.formatter.success(example, result)
         elif result.kind == ExampleResult.FAILURE:
-            self.failure_count += 1
+            self.failures.append((example, result))
             self.formatter.failure(example, result)
         elif result.kind == ExampleResult.ERROR:
-            self.error_count += 1
+            self.errors.append((example, result))
             self.formatter.error(example, result)
         else:
             raise ValueError('Unrecognised Example result kind')
 
+    def run_finished(self):
+        self.formatter.summarise_results(self.total_number_of_examples(),
+                self.number_of_successes(), 
+                self.number_of_failures(),
+                self.number_of_errors())
+        self.formatter.summarise_failures(self.failures)
+        self.formatter.summarise_errors(self.errors)
+
     def total_number_of_examples(self):
-        return self.success_count + self.failure_count + self.error_count
+        return self.success_count + self.number_of_failures() + self.number_of_errors()
 
     def number_of_successes(self):
         return self.success_count
 
     def number_of_failures(self):
-        return self.failure_count
+        return len(self.failures)
 
     def number_of_errors(self):
-        return self.error_count
+        return len(self.errors)
