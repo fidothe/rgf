@@ -1,4 +1,4 @@
-import sys
+import sys, traceback
 
 class Example(object):
     def __init__(self, description, spec_function):
@@ -127,3 +127,15 @@ class ProgressFormatter(object):
 
     def summarise_results(self, total, successes, failures, errors):
         self.write_line('Ran %s examples: %s success, %s failure, %s error' % (total, successes, failures, errors))
+
+    def summarise_failures_or_errors(self, failures_or_errors):
+        for (example, example_result) in failures_or_errors:
+            self.write_line(example.description)
+            traceback.print_exception(type(example_result.exception), 
+                    example_result.exception, example_result.traceback, file = self.io)
+
+    def summarise_failures(self, failures):
+        self.summarise_failures_or_errors(failures)
+
+    def summarise_errors(self, errors):
+        self.summarise_failures_or_errors(errors)

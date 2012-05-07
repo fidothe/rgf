@@ -194,7 +194,24 @@ pf.summarise_results(total = 3, successes = 1, failures = 1, errors = 1)
 assert io.getvalue() == 'Ran 3 examples: 1 success, 1 failure, 1 error\n'
 
 # ProgressFormatter can summarise failures
+def failed_test_function(self):
+    assert False
+failing_example = Example("reports failure", failed_test_function)
+result = failing_example.run(MockExampleGroup())
+io = StringIO.StringIO()
+pf = ProgressFormatter(io)
+pf.summarise_failures([(failing_example, result)])
+assert io.getvalue() != '' # there must be a better test than this which isn't terrifyingly brittle
+
 # ProgressFormatter can summarise errors
+def error_test_function(self):
+    raise KeyError('grrr')
+error_example = Example("reports error", error_test_function)
+result = failing_example.run(MockExampleGroup())
+io = StringIO.StringIO()
+pf = ProgressFormatter(io)
+pf.summarise_errors([(error_example, result)])
+assert io.getvalue() != '' # there must be a better test than this which isn't terrifyingly brittle
 
 # Reporter uses its formatter to report status, summary and tracebacks for a run
 
