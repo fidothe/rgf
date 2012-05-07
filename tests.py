@@ -1,4 +1,4 @@
-import StringIO
+import StringIO, sys
 from rgf import Example, ExampleGroup, ExampleSuite, describe, it, before, ProgressFormatter, ExampleResult, Reporter
 
 class MockExampleGroup(object):
@@ -45,244 +45,287 @@ class MockFormatter(object):
     def summarise_errors(self, errors):
         self.summarise_errors_called_with = errors
 
-# Example can be run
-def first_test_function(self):
-    self.has_been_run = True
+def first_test_function(world):
+    world.has_been_run = True
 
-first_example = Example("can be run", first_test_function)
-first_example.run(MockExampleGroup())
-assert first_example.has_been_run
-
-# Example is run with before func from context
-second_example = Example("runs before method from context", first_test_function)
-second_example.run(MockExampleGroup())
-assert second_example.before_was_run
-
-# Successful example reports its success
-third_example = Example("reports success", first_test_function)
-result = third_example.run(MockExampleGroup())
-assert type(result) == ExampleResult
-assert result.kind == 1
-assert result.traceback is None
-
-# Exploded example reports its error
-an_error = StandardError("An Error")
-def bad_test_function(self):
-    raise an_error
-
-third_example = Example("reports error", bad_test_function)
-result = third_example.run(MockExampleGroup())
-assert type(result) == ExampleResult
-assert result.exception is an_error
-assert result.traceback is not None
-assert result.kind == 3
-
-# Failed example reports its error
-def failed_test_function(self):
-    assert False
-
-fourth_example = Example("reports failure", failed_test_function)
-result = fourth_example.run(MockExampleGroup())
-assert type(result) == ExampleResult
-assert type(result.exception) is AssertionError
-assert result.traceback is not None
-assert result.kind == 2
-
-# ExampleGroups can be created and described
-eg = ExampleGroup(MockExampleSuite(), "A group of Examples")
-assert eg.description == "A group of Examples"
-
-# Examples can be grouped and run together
-eg = ExampleGroup(MockExampleSuite(), "")
-eg.add_example(Example('All good', first_test_function))
-eg.add_example(Example('Still good', first_test_function))
-eg.run(MockReporter())
-
-assert eg.examples[0].has_been_run
-assert eg.examples[1].has_been_run
-
-# ExampleGroups can have setup code to be run before examples added
 def before_func(world):
     world.before_was_run = True
 
-eg = ExampleGroup(MockExampleSuite(), '')
-eg.add_example(Example('All good', first_test_function))
-eg.add_example(Example('Still good', first_test_function))
-eg.add_before(before_func)
-eg.run(MockReporter())
+with describe('Example'):
+    @it('can be run')
+    def spec(world):
+        first_example = Example("can be run", first_test_function)
+        first_example.run(MockExampleGroup())
+        assert first_example.has_been_run
 
-assert eg.examples[0].before_was_run
-assert eg.examples[1].before_was_run
+    @it('is run with before func from context')
+    def spec(world):
+        second_example = Example("runs before method from context", first_test_function)
+        second_example.run(MockExampleGroup())
+        assert second_example.before_was_run
 
-# ExampleSuite can collect many ExampleGroups
-suite = ExampleSuite()
-example_group = suite.add_example_group('ExampleGroup description')
-assert type(example_group) is ExampleGroup
-assert example_group in suite.example_groups
+    @it('example reports its success Successful')
+    def spec(world):
+        third_example = Example("reports success", first_test_function)
+        result = third_example.run(MockExampleGroup())
+        assert type(result) == ExampleResult
+        assert result.kind == 1
+        assert result.traceback is None
 
-# ExampleSuite returns itself as the current ExampleGroup if there is none.
-suite = ExampleSuite()
-assert suite.get_current_example_group() is suite
+    @it('example reports its error if it exploded')
+    def spec(world):
+        an_error = StandardError("An Error")
+        def bad_test_function(self):
+            raise an_error
 
-# ExampleSuite allows the current ExampleGroup to be set
-suite = ExampleSuite()
-example_group = suite.add_example_group('ExampleGroup description')
-suite.set_current_example_group(example_group)
-assert suite.get_current_example_group() is example_group
+        third_example = Example("reports error", bad_test_function)
+        result = third_example.run(MockExampleGroup())
+        assert type(result) == ExampleResult
+        assert result.exception is an_error
+        assert result.traceback is not None
+        assert result.kind == 3
 
-# ExampleSuite allows the current ExampleGroup to be popped off
-suite = ExampleSuite()
-example_group = suite.add_example_group('ExampleGroup description')
-suite.set_current_example_group(example_group)
-suite.pop_current_example_group()
-assert suite.get_current_example_group() is suite
+    @it('reports its error on failure')
+    def spec(world):
+        def failed_test_function(self):
+            assert False
 
-# ExampleSuite can create and return a single instance of itself
-assert type(ExampleSuite.get_suite()) is ExampleSuite
-assert ExampleSuite.get_suite() is ExampleSuite.get_suite()
+        fourth_example = Example("reports failure", failed_test_function)
+        result = fourth_example.run(MockExampleGroup())
+        assert type(result) == ExampleResult
+        assert type(result.exception) is AssertionError
+        assert result.traceback is not None
+        assert result.kind == 2
 
-# An ExampleGroup responds to the context mangaer __enter__ API call and sets itself as the current example group in the suite
-example_suite = ExampleSuite()
-example_group = ExampleGroup(example_suite, '__enter__ group')
-assert example_group.__enter__() is example_group
-assert example_suite.get_current_example_group() is example_group
+with describe('ExampleGroup'):
+    @it('can be created and described')
+    def spec(world):
+        eg = ExampleGroup(MockExampleSuite(), "A group of Examples")
+        assert eg.description == "A group of Examples"
 
-# An ExampleGroup responds to the context manage __exit__ API call and removes itself as the current example group
-example_suite = ExampleSuite()
-example_group = ExampleGroup(example_suite, '__exit__ group')
-example_suite.set_current_example_group(example_group)
-example_group.__exit__(None, None, None)
-assert example_suite.get_current_example_group() is example_suite
+        # Examples can be grouped and run together
+        eg = ExampleGroup(MockExampleSuite(), "")
+        eg.add_example(Example('All good', first_test_function))
+        eg.add_example(Example('Still good', first_test_function))
+        eg.run(MockReporter())
 
-# provide describe helper context to create and set current ExampleGroup
-eg = describe('This Example Group')
-assert type(eg) is ExampleGroup
+        assert eg.examples[0].has_been_run
+        assert eg.examples[1].has_been_run
 
-# provide it() decorator creator. The decorator creates Examples on the current ExampleGroup
-with describe('Example Group with examples added by it()') as eg:
-    decorator = it('Example description created by it()')
-    example = decorator(first_test_function)
-    assert example.description == 'Example description created by it()'
-    assert eg.examples == [example]
+    @it('can have setup code to be run before examples added')
+    def spec(world):
+        eg = ExampleGroup(MockExampleSuite(), '')
+        eg.add_example(Example('All good', first_test_function))
+        eg.add_example(Example('Still good', first_test_function))
+        eg.before(before_func)
+        eg.run(MockReporter())
 
-# provide before() decorator creator. The decorator adds a function to the current ExampleGroup's before runner
-with describe('Example Group with before function') as eg:
-    decorator = before()
-    decorator(before_func)
-    assert eg.before_function is before_func
+        assert eg.examples[0].before_was_run
+        assert eg.examples[1].before_was_run
 
-# describe decorator allows the parent of the ExampleGroup to be specified
-example_suite = ExampleSuite()
-with describe('ExampleGroup with hard-wired parent', parent = example_suite) as eg:
-    assert eg.parent is example_suite
+with describe('ExampleSuite'):
+    @it('can collect many ExampleGroups')
+    def spec(world):
+        suite = ExampleSuite()
+        example_group = suite.add_example_group('ExampleGroup description')
+        assert type(example_group) is ExampleGroup
+        assert example_group in suite.example_groups
 
-# it decorator allows the ExampleGroup to be specified
-example_suite = ExampleSuite()
-example_group = ExampleGroup(example_suite, 'eg for explicit passing to it() decorator')
-decorator = it('has explicit ExampleGroup', example_group = example_group)
-example = decorator(first_test_function)
-assert example_group.examples == [example]
+    @it('returns itself as the current ExampleGroup if there is none')
+    def spec(world):
+        suite = ExampleSuite()
+        assert suite.get_current_example_group() is suite
 
-# before decorator allows the ExampleGroup to be set
-example_suite = ExampleSuite()
-example_group = ExampleGroup(example_suite, 'eg for explicit passing to before() decorator')
-decorator = before(example_group = example_group)
-decorator(before_func)
-assert example_group.before_function is before_func
+    @it('allows the current ExampleGroup to be set')
+    def spec(world):
+        suite = ExampleSuite()
+        example_group = suite.add_example_group('ExampleGroup description')
+        suite.set_current_example_group(example_group)
+        assert suite.get_current_example_group() is example_group
 
-# ExampleSuite.run() runs all its ExampleGroups
-example_suite = ExampleSuite()
-example_group = example_suite.add_example_group('eg for explicit passing to it decorator')
-example_group.print_run = True
-@it('has explicit ExampleGroup', example_group = example_group)
-def f(world):
-    world.has_been_run = True
+    @it('allows the current ExampleGroup to be popped off')
+    def spec(world):
+        suite = ExampleSuite()
+        example_group = suite.add_example_group('ExampleGroup description')
+        suite.set_current_example_group(example_group)
+        suite.pop_current_example_group()
+        assert suite.get_current_example_group() is suite
 
-example_suite.run(MockReporter())
-assert example_group.examples[0].has_been_run
+    @it('can create and return a single instance of itself')
+    def spec(world):
+        assert type(ExampleSuite.get_suite()) is ExampleSuite
+        assert ExampleSuite.get_suite() is ExampleSuite.get_suite()
 
-# ProgressFormatter can log a success to an IO-like object
-io = StringIO.StringIO()
-pf = ProgressFormatter(io)
-pf.success(MockExample(), (1, None))
-assert io.getvalue() == '.'
+    @it('can run run all its ExampleGroups')
+    def spec(world):
+        example_suite = ExampleSuite()
+        example_group = example_suite.add_example_group('eg for explicit passing to it decorator')
+        example_group.print_run = True
+        @it('has explicit ExampleGroup', example_group = example_group)
+        def f(world):
+            world.has_been_run = True
 
-# ProgressFormatter can log a failure to an IO-like object
-io = StringIO.StringIO()
-pf = ProgressFormatter(io)
-pf.failure(MockExample(), (2, None))
-assert io.getvalue() == 'F'
+        example_suite.run(MockReporter())
+        assert example_group.examples[0].has_been_run
 
-# ProgressFormatter can log an error to an IO-like object
-io = StringIO.StringIO()
-pf = ProgressFormatter(io)
-pf.error(MockExample(), (3, None))
-assert io.getvalue() == 'E'
+    @it('tells the Reporter when the run has finished')
+    def spec(world):
+        example_suite = ExampleSuite()
+        reporter = MockReporter()
+        example_suite.run(reporter)
+        assert reporter.run_finished_was_called
 
-# ProgressFormatter can summarise the results of running all examples
-io = StringIO.StringIO()
-pf = ProgressFormatter(io)
-pf.summarise_results(total = 3, successes = 1, failures = 1, errors = 1)
-assert io.getvalue() == 'Ran 3 examples: 1 success, 1 failure, 1 error\n'
+with describe('ExampleGroup context manager API'):
+    @it('sets itself as the current example group in the suite on __enter__()')
+    def spec(world):
+        example_suite = ExampleSuite()
+        example_group = ExampleGroup(example_suite, '__enter__ group')
+        assert example_group.__enter__() is example_group
+        assert example_suite.get_current_example_group() is example_group
 
-# ProgressFormatter can summarise failures
-def failed_test_function(self):
-    assert False
-failing_example = Example("reports failure", failed_test_function)
-result = failing_example.run(MockExampleGroup())
-io = StringIO.StringIO()
-pf = ProgressFormatter(io)
-pf.summarise_failures([(failing_example, result)])
-assert io.getvalue() != '' # there must be a better test than this which isn't terrifyingly brittle
+    @it('removes itself as the current example group on __exit__()')
+    def spec(world):
+        example_suite = ExampleSuite()
+        example_group = ExampleGroup(example_suite, '__exit__ group')
+        example_suite.set_current_example_group(example_group)
+        example_group.__exit__(None, None, None)
+        assert example_suite.get_current_example_group() is example_suite
 
-# ProgressFormatter can summarise errors
-def error_test_function(self):
-    raise KeyError('grrr')
-error_example = Example("reports error", error_test_function)
-result = failing_example.run(MockExampleGroup())
-io = StringIO.StringIO()
-pf = ProgressFormatter(io)
-pf.summarise_errors([(error_example, result)])
-assert io.getvalue() != '' # there must be a better test than this which isn't terrifyingly brittle
+with describe('DSL'):
+    @it('provides describe helper context to create and set current ExampleGroup')
+    def spec(world):
+        eg = describe('This Example Group')
+        assert type(eg) is ExampleGroup
 
-# ExampleGroup.run reports its result
-example_suite = ExampleSuite()
-example_group = ExampleGroup(example_suite, 'reports')
-ex1 = Example('All good', first_test_function)
-ex2 = Example('Fail', failed_test_function)
-ex3 = Example('Error', error_test_function)
-example_group.add_example(ex1)
-example_group.add_example(ex2)
-example_group.add_example(ex3)
-io = StringIO.StringIO()
-formatter = MockFormatter()
-reporter = Reporter(formatter)
-example_group.run(reporter)
+    @it('provides it() decorator creator. The decorator creates Examples on the current ExampleGroup')
+    def spec(world):
+        with describe('Example Group with examples added by it()') as eg:
+            decorator = it('Example description created by it()')
+            example = decorator(first_test_function)
+            assert example.description == 'Example description created by it()'
+            assert eg.examples == [example]
 
-assert formatter.successes == [ex1]
-assert formatter.failures == [ex2]
-assert formatter.errors == [ex3]
+    @it("provides before() decorator creator. The decorator adds a function to the current ExampleGroup's before runner")
+    def spec(world):
+        with describe('Example Group with before function') as eg:
+            before(before_func)
+            assert eg.before_function is before_func
 
-# Reporter can report statistics
-assert reporter.total_number_of_examples() == 3
-assert reporter.number_of_successes() == 1
-assert reporter.number_of_failures() == 1
-assert reporter.number_of_errors() == 1
+    @it('describe allows the parent of the ExampleGroup to be specified')
+    def spec(world):
+        example_suite = ExampleSuite()
+        with describe('ExampleGroup with hard-wired parent', parent = example_suite) as eg:
+            assert eg.parent is example_suite
 
-# Reporter uses its formatter to report status, summary and tracebacks for a run
-reporter.run_finished()
-assert formatter.summarise_results_called_with == (3, 1, 1, 1)
-assert len(formatter.summarise_failures_called_with) == 1
-assert formatter.summarise_failures_called_with[0][0] == ex2
-assert type(formatter.summarise_failures_called_with[0][1]) == ExampleResult
-assert len(formatter.summarise_errors_called_with) == 1
-assert formatter.summarise_errors_called_with[0][0] == ex3
-assert type(formatter.summarise_errors_called_with[0][1]) == ExampleResult
+    @it('allows the ExampleGroup to be explicitly passed to the the it decorator')
+    def spec(world):
+        example_suite = ExampleSuite()
+        example_group = ExampleGroup(example_suite, 'eg for explicit passing to it() decorator')
+        decorator = it('has explicit ExampleGroup', example_group = example_group)
+        example = decorator(first_test_function)
+        assert example_group.examples == [example]
 
-# ExampleSuite.run() calls Reporter.run_finished() when the run has finished
-example_suite = ExampleSuite()
-reporter = MockReporter()
-example_suite.run(reporter)
-assert reporter.run_finished_was_called
+with describe('ProgressFormatter'):
+    @it('can log a success to an IO-like object')
+    def spec(world):
+        io = StringIO.StringIO()
+        pf = ProgressFormatter(io)
+        pf.success(MockExample(), (1, None))
+        assert io.getvalue() == '.'
+
+    @it('can log a failure to an IO-like object')
+    def spec(world):
+        io = StringIO.StringIO()
+        pf = ProgressFormatter(io)
+        pf.failure(MockExample(), (2, None))
+        assert io.getvalue() == 'F'
+
+    @it('can log an error to an IO-like object')
+    def spec(world):
+        io = StringIO.StringIO()
+        pf = ProgressFormatter(io)
+        pf.error(MockExample(), (3, None))
+        assert io.getvalue() == 'E'
+
+    @it('can summarise the results of running all examples')
+    def spec(world):
+        io = StringIO.StringIO()
+        pf = ProgressFormatter(io)
+        pf.summarise_results(total = 3, successes = 1, failures = 1, errors = 1)
+        assert io.getvalue() == 'Ran 3 examples: 1 success, 1 failure, 1 error\n'
+
+with describe('ProgressFormatter summarising Failures and Errors'):
+    @before
+    def b(world):
+        def failed_test_function(self):
+            assert False
+        world.failing_example = Example("reports failure", failed_test_function)
+
+        def error_test_function(self):
+            raise KeyError('grrr')
+        world.error_example = Example("reports error", error_test_function)
+
+    @it('can summarise failures')
+    def spec(world):
+        result = world.failing_example.run(MockExampleGroup())
+        io = StringIO.StringIO()
+        pf = ProgressFormatter(io)
+        pf.summarise_failures([(world.failing_example, result)])
+        assert io.getvalue() != '' # there must be a better test than this which isn't terrifyingly brittle
+
+    @it('can summarise errors')
+    def spec(world):
+        result = world.failing_example.run(MockExampleGroup())
+        io = StringIO.StringIO()
+        pf = ProgressFormatter(io)
+        pf.summarise_errors([(world.error_example, result)])
+        assert io.getvalue() != '' # there must be a better test than this which isn't terrifyingly brittle
+
+with describe('Reporter'):
+    @before
+    def b(world):
+        def failing_test_function(self):
+            assert False
+        def error_test_function(self):
+            raise KeyError('grrr')
+        example_suite = ExampleSuite()
+        example_group = ExampleGroup(example_suite, 'reports')
+        world.ex1 = Example('All good', first_test_function)
+        world.ex2 = Example('Fail', failing_test_function)
+        world.ex3 = Example('Error', error_test_function)
+        example_group.add_example(world.ex1)
+        example_group.add_example(world.ex2)
+        example_group.add_example(world.ex3)
+        io = StringIO.StringIO()
+        world.mock_formatter = MockFormatter()
+        world.reporter = Reporter(world.mock_formatter)
+        example_group.run(world.reporter)
+
+    @it('ExampleGroup.run reports its result')
+    def spec(world):
+        assert world.mock_formatter.successes == [world.ex1]
+        assert world.mock_formatter.failures == [world.ex2]
+        assert world.mock_formatter.errors == [world.ex3]
+
+    @it('can report statistics')
+    def spec(world):
+        assert world.reporter.total_number_of_examples() == 3
+        assert world.reporter.number_of_successes() == 1
+        assert world.reporter.number_of_failures() == 1
+        assert world.reporter.number_of_errors() == 1
+
+    @it('uses its formatter to report status, summary and tracebacks for a run')
+    def spec(world):
+        world.reporter.run_finished()
+        assert world.mock_formatter.summarise_results_called_with == (3, 1, 1, 1)
+        assert len(world.mock_formatter.summarise_failures_called_with) == 1
+        assert world.mock_formatter.summarise_failures_called_with[0][0] == world.ex2
+        assert type(world.mock_formatter.summarise_failures_called_with[0][1]) == ExampleResult
+        assert len(world.mock_formatter.summarise_errors_called_with) == 1
+        assert world.mock_formatter.summarise_errors_called_with[0][0] == world.ex3
+        assert type(world.mock_formatter.summarise_errors_called_with[0][1]) == ExampleResult
 
 # Once we get to this point we can self-host our single-file test run :-)
+formatter = ProgressFormatter(sys.stdout)
+reporter = Reporter(formatter)
+ExampleSuite.get_suite().run(reporter)

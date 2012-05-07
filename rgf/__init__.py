@@ -27,7 +27,7 @@ class ExampleGroup(object):
     def add_example(self, example):
         self.examples.append(example)
 
-    def add_before(self, before_function):
+    def before(self, before_function):
         self.before_function = before_function
 
     def run(self, reporter):
@@ -93,12 +93,9 @@ def it(description, example_group = None):
         return example
     return example_creator
 
-def before(example_group = None):
-    if example_group is None:
-        example_group = _get_current_example_group()
-    def before_wrapper(before_function):
-        example_group.add_before(before_function)
-    return before_wrapper
+def before(before_function):
+    example_group = _get_current_example_group()
+    example_group.before(before_function)
 
 class ExampleResult(object):
     SUCCESS = 1
