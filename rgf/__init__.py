@@ -9,13 +9,13 @@ class Example(object):
         example_group.run_before_each(self)
         try:
             self.spec_function(self)
-            return ExampleResult(1, None, None)
+            return ExampleResult.as_success()
         except AssertionError:
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            return ExampleResult(2, exc_value, exc_traceback)
+            return ExampleResult.as_failure(exc_value, exc_traceback)
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            return ExampleResult(3, exc_value, exc_traceback)
+            return ExampleResult.as_error(exc_value, exc_traceback)
 
 class ExampleGroup(object):
     def __init__(self, parent, description):
@@ -101,6 +101,18 @@ class ExampleResult(object):
     SUCCESS = 1
     FAILURE = 2
     ERROR = 3
+
+    @classmethod
+    def as_success(cls):
+        return cls(cls.SUCCESS)
+
+    @classmethod
+    def as_failure(cls, *args):
+        return cls(cls.FAILURE, *args)
+
+    @classmethod
+    def as_error(cls, *args):
+        return cls(cls.ERROR, *args)
 
     def __init__(self, kind, exception = None, traceback = None):
         self.kind = kind
