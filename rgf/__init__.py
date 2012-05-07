@@ -30,8 +30,10 @@ class ExampleGroup(object):
     def add_before(self, before_function):
         self.before_function = before_function
 
-    def run(self):
-        [example.run(self) for example in self.examples]
+    def run(self, reporter):
+        for example in self.examples:
+            result = example.run(self)
+            reporter.example_ran(example, result)
 
     def run_before_each(self, example):
         if self.before_function:
@@ -69,8 +71,8 @@ class ExampleSuite(object):
     def pop_current_example_group(self):
         self.current_example_group_stack.pop()
 
-    def run(self):
-        [example_group.run() for example_group in self.example_groups]
+    def run(self, reporter):
+        [example_group.run(reporter) for example_group in self.example_groups]
 
 def _get_current_example_group():
     return ExampleSuite.get_suite().get_current_example_group()
@@ -98,6 +100,10 @@ def before(example_group = None):
     return before_wrapper
 
 class ExampleResult(object):
+    SUCCESS = 1
+    FAILURE = 2
+    ERROR = 3
+
     def __init__(self, kind, exception = None, traceback = None):
         self.kind = kind
         self.exception = exception
@@ -137,3 +143,16 @@ class ProgressFormatter(object):
 
     def summarise_errors(self, errors):
         self.summarise_failures_or_errors(errors)
+
+class Reporter(object):
+    def __init__(self, formatter):
+        self.formatter = formatter
+    def example_ran(self, example, result):
+        if result.kind == ExampleResult.SUCCESS:
+            self.formatter.success(example, result)
+        elif result.kind == ExampleResult.FAILURE:
+            self.formatter.failure(example, result)
+        elif result.kind == ExampleResult.ERROR:
+            self.formatter.error(example, result)
+        else:
+            raise ValueError('Unrecognised Example result kind')

@@ -1,5 +1,5 @@
 import StringIO
-from rgf import Example, ExampleGroup, ExampleSuite, describe, it, before, ProgressFormatter, ExampleResult
+from rgf import Example, ExampleGroup, ExampleSuite, describe, it, before, ProgressFormatter, ExampleResult, Reporter
 
 class MockExampleGroup(object):
     def run_before_each(self, example):
@@ -12,6 +12,25 @@ class MockExampleSuite(object):
 
 class MockExample(object):
     pass
+
+class MockReporter(object):
+    def example_ran(self, *args):
+        pass
+
+class MockFormatter(object):
+    def __init__(self):
+        self.successes = []
+        self.failures = []
+        self.errors = []
+
+    def success(self, example, result):
+        self.successes.append(example)
+
+    def failure(self, example, result):
+        self.failures.append(example)
+
+    def error(self, example, result):
+        self.errors.append(example)
 
 # Example can be run
 def first_test_function(self):
@@ -64,7 +83,7 @@ assert eg.description == "A group of Examples"
 eg = ExampleGroup(MockExampleSuite(), "")
 eg.add_example(Example('All good', first_test_function))
 eg.add_example(Example('Still good', first_test_function))
-eg.run()
+eg.run(MockReporter())
 
 assert eg.examples[0].has_been_run
 assert eg.examples[1].has_been_run
@@ -77,7 +96,7 @@ eg = ExampleGroup(MockExampleSuite(), '')
 eg.add_example(Example('All good', first_test_function))
 eg.add_example(Example('Still good', first_test_function))
 eg.add_before(before_func)
-eg.run()
+eg.run(MockReporter())
 
 assert eg.examples[0].before_was_run
 assert eg.examples[1].before_was_run
@@ -166,7 +185,7 @@ example_group.print_run = True
 def f(world):
     world.has_been_run = True
 
-example_suite.run()
+example_suite.run(MockReporter())
 assert example_group.examples[0].has_been_run
 
 # ProgressFormatter can log a success to an IO-like object
@@ -212,6 +231,24 @@ io = StringIO.StringIO()
 pf = ProgressFormatter(io)
 pf.summarise_errors([(error_example, result)])
 assert io.getvalue() != '' # there must be a better test than this which isn't terrifyingly brittle
+
+# ExampleGroup.run reports its result
+example_suite = ExampleSuite()
+example_group = ExampleGroup(example_suite, 'reports')
+ex1 = Example('All good', first_test_function)
+ex2 = Example('Fail', failed_test_function)
+ex3 = Example('Error', error_test_function)
+example_group.add_example(ex1)
+example_group.add_example(ex2)
+example_group.add_example(ex3)
+io = StringIO.StringIO()
+formatter = MockFormatter()
+reporter = Reporter(formatter)
+example_group.run(reporter)
+
+assert formatter.successes == [ex1]
+assert formatter.failures == [ex2]
+assert formatter.errors == [ex3]
 
 # Reporter uses its formatter to report status, summary and tracebacks for a run
 
