@@ -325,7 +325,23 @@ with describe('Reporter'):
         assert world.mock_formatter.summarise_errors_called_with[0][0] == world.ex3
         assert type(world.mock_formatter.summarise_errors_called_with[0][1]) == ExampleResult
 
-# Once we get to this point we can self-host our single-file test run :-)
 formatter = ProgressFormatter(sys.stdout)
 reporter = Reporter(formatter)
 ExampleSuite.get_suite().run(reporter)
+
+# from future, import...
+# Collector can find spec files in a directory hierarchy
+# Collector can import a spec file and collect its ExampleGroups
+# Runner can collect and run spec files through a Reporter
+# rgf script can create and run a runner
+# --> At this point we can start to break up the tests into multiple files :-)
+# Actually work out the language issues
+# rgf script returns non-zero exit status if any specs failed
+# --> At this point we can be used by a CI bot :-)
+# ExampleGroups can be properly nested
+# before-functions are properly dealt with in nested contexts
+# ProgressFormatter can output coloured dots if asked
+# DocumentationFormatter can output something like Rspec's specdoc format
+# formatter can be chosen by passing an arg to rgf
+# config can be extracted to a .rgf project file
+# --> At this point we're probably useful
