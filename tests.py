@@ -1,6 +1,6 @@
-import StringIO, sys
+import StringIO, sys, os.path
 from rgf.core.examples import Example, ExampleGroup, ExampleSuite, ExampleResult
-from rgf.core.runner import ProgressFormatter, Reporter
+from rgf.core.runner import ProgressFormatter, Reporter, Collector
 from rgf.dsl import describe, it, before
 
 class MockExampleGroup(object):
@@ -327,12 +327,21 @@ with describe('Reporter'):
         assert world.mock_formatter.summarise_errors_called_with[0][0] == world.ex3
         assert type(world.mock_formatter.summarise_errors_called_with[0][1]) == ExampleResult
 
+with describe('Collector'):
+    @it('can find spec files in a directory hierarchy')
+    def f(w):
+        actual = Collector.locate_spec_files_in(os.path.abspath('spec/fixtures/sample_spec_dir'))
+        expected = ['a_spec.py', 'b/b_spec.py', 'c/d/d_spec.py']
+        expected = [os.path.abspath('spec/fixtures/sample_spec_dir/%s' % x) for x in expected]
+        actual.sort()
+        expected.sort()
+        assert actual == expected
+
 formatter = ProgressFormatter(sys.stdout)
 reporter = Reporter(formatter)
 ExampleSuite.get_suite().run(reporter)
 
 # from future, import...
-# Collector can find spec files in a directory hierarchy
 # Collector can import a spec file and collect its ExampleGroups
 # Runner can collect and run spec files through a Reporter
 # rgf script can create and run a runner

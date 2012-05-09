@@ -1,4 +1,4 @@
-import traceback
+import traceback, os, os.path, re
 from rgf.core.examples import ExampleResult
 
 class ProgressFormatter(object):
@@ -75,3 +75,14 @@ class Reporter(object):
 
     def number_of_errors(self):
         return len(self.errors)
+
+class Collector(object):
+    @classmethod
+    def locate_spec_files_in(cls, start_path):
+        spec_files = []
+        spec_matcher = re.compile(r'[\w]+_spec\.py')
+        for path, dirs, files in os.walk(start_path):
+            for name in files:
+                if spec_matcher.match(name):
+                    spec_files.append(os.path.join(path, name))
+        return spec_files
