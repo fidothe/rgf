@@ -1,5 +1,7 @@
 import StringIO, sys
-from rgf import Example, ExampleGroup, ExampleSuite, describe, it, before, ProgressFormatter, ExampleResult, Reporter
+from rgf.core.examples import Example, ExampleGroup, ExampleSuite, ExampleResult
+from rgf.core.runner import ProgressFormatter, Reporter
+from rgf.dsl import describe, it, before
 
 class MockExampleGroup(object):
     def run_before_each(self, example):
