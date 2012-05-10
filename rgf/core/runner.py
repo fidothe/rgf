@@ -98,3 +98,7 @@ class Collector(object):
         with file(path) as f:
             mod = imp.load_module(name, f, path, ('.py', 'U', imp.PY_SOURCE))
         return mod
+
+    def import_specs(self):
+        for spec_path in self.found_spec_files():
+            self.import_spec_file(spec_path, self.start_path)

@@ -346,6 +346,19 @@ with describe('Collector'):
         assert mod.__name__ == 'spec.b.b_spec'
         assert mod.__file__.index(spec_file_path) == 0
 
+    @it('can import multiple spec files')
+    def f(w):
+        spec_root_path = os.path.abspath('spec/fixtures/sample_spec_dir')
+        collector = Collector(spec_root_path)
+        imported_files = []
+        def mock_import_file_func(path, root):
+            imported_files.append(path)
+        collector.import_spec_file = mock_import_file_func
+        collector.import_specs()
+        expected = ['a_spec.py', 'b/b_spec.py', 'c/d/d_spec.py']
+        expected = [os.path.abspath('spec/fixtures/sample_spec_dir/%s' % x) for x in expected]
+        assert imported_files == expected
+
 formatter = ProgressFormatter(sys.stdout)
 reporter = Reporter(formatter)
 ExampleSuite.get_suite().run(reporter)
