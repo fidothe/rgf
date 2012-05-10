@@ -151,3 +151,12 @@ class Collector(object):
     def collect_to(self, example_suite):
         ExampleSuite.set_suite(example_suite)
         self.import_spec_files()
+
+class Runner(object):
+    def __init__(self, reporter):
+        self.reporter = reporter
+
+    def run(self, suite, path):
+        collector = Collector(path)
+        collector.collect_to(suite)
+        suite.run(self.reporter)

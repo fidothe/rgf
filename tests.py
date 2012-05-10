@@ -375,12 +375,20 @@ with describe('Collector'):
         collector.collect_to(example_suite)
         assert len(example_suite.example_groups) == 4
 
+with describe('Runner'):
+    @it('can collect and run spec files through a Reporter')
+    def f(w):
+        reporter = MockReporter()
+        runner = Runner(reporter)
+        suite = ExampleSuite()
+        runner.run(suite, 'spec/fixtures/sample_spec_dir')
+        assert len(reporter.examples_ran) > 0
+
 formatter = ProgressFormatter(sys.stdout)
 reporter = Reporter(formatter)
 ExampleSuite.get_suite().run(reporter)
 
 # from future, import...
-# Runner can collect and run spec files through a Reporter
 # rgf script can create and run a runner
 # --> At this point we can start to break up the tests into multiple files :-)
 # Actually work out the language issues
