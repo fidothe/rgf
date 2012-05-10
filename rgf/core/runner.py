@@ -1,4 +1,4 @@
-import traceback, os, os.path, re
+import traceback, os, os.path, re, imp
 from rgf.core.examples import ExampleResult
 
 class ProgressFormatter(object):
@@ -77,12 +77,24 @@ class Reporter(object):
         return len(self.errors)
 
 class Collector(object):
-    @classmethod
-    def locate_spec_files_in(cls, start_path):
+    def __init__(self, start_path):
+        self.start_path = start_path
+
+    def found_spec_files(self):
         spec_files = []
-        spec_matcher = re.compile(r'[\w]+_spec\.py')
-        for path, dirs, files in os.walk(start_path):
+        spec_matcher = re.compile(r'[\w]+_spec\.py$')
+        for path, dirs, files in os.walk(self.start_path):
             for name in files:
                 if spec_matcher.match(name):
                     spec_files.append(os.path.join(path, name))
         return spec_files
+
+    def import_spec_file(self, path, root):
+        module_hierarchy_components = os.path.relpath(path, root).split(os.path.sep)
+        last_mod, ext = os.path.splitext(module_hierarchy_components[-1])
+        module_hierarchy_components[-1:] = [last_mod]
+        module_hierarchy_components[:0] = ['spec']
+        name = '.'.join(module_hierarchy_components)
+        with file(path) as f:
+            mod = imp.load_module(name, f, path, ('.py', 'U', imp.PY_SOURCE))
+        return mod

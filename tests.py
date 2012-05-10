@@ -330,19 +330,27 @@ with describe('Reporter'):
 with describe('Collector'):
     @it('can find spec files in a directory hierarchy')
     def f(w):
-        actual = Collector.locate_spec_files_in(os.path.abspath('spec/fixtures/sample_spec_dir'))
+        actual = Collector(os.path.abspath('spec/fixtures/sample_spec_dir')).found_spec_files()
         expected = ['a_spec.py', 'b/b_spec.py', 'c/d/d_spec.py']
         expected = [os.path.abspath('spec/fixtures/sample_spec_dir/%s' % x) for x in expected]
         actual.sort()
         expected.sort()
         assert actual == expected
 
+    @it('can import a spec file and collect its ExampleGroups')
+    def f(w):
+        spec_file_path = os.path.abspath('spec/fixtures/sample_spec_dir/b/b_spec.py')
+        spec_root_path = os.path.abspath('spec/fixtures/sample_spec_dir')
+        collector = Collector('/path/to/spec')
+        mod = collector.import_spec_file(spec_file_path, root = spec_root_path)
+        assert mod.__name__ == 'spec.b.b_spec'
+        assert mod.__file__.index(spec_file_path) == 0
+
 formatter = ProgressFormatter(sys.stdout)
 reporter = Reporter(formatter)
 ExampleSuite.get_suite().run(reporter)
 
 # from future, import...
-# Collector can import a spec file and collect its ExampleGroups
 # Runner can collect and run spec files through a Reporter
 # rgf script can create and run a runner
 # --> At this point we can start to break up the tests into multiple files :-)
