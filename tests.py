@@ -1,4 +1,4 @@
-import StringIO, sys, os.path, sets
+import StringIO, sys, os.path, sets, subprocess, re
 from rgf.core.examples import Example, ExampleGroup, ExampleSuite, ExampleResult
 from rgf.core.runner import ProgressFormatter, Reporter, Collector, Runner
 from rgf.dsl import describe, it, before
@@ -384,12 +384,20 @@ with describe('Runner'):
         runner.run(suite, 'spec/fixtures/sample_spec_dir')
         assert len(reporter.examples_ran) > 0
 
+with describe('rgf script'):
+    @it('can create and run a runner')
+    def f(w):
+        p = subprocess.Popen('bin/rgf spec/fixtures/sample_spec_dir', shell = True, stdout = subprocess.PIPE)
+        output, p_null = p.communicate()
+        return_val = p.wait()
+        assert return_val == 0
+        assert re.compile(r'4 examples').search(output) is not None
+
 formatter = ProgressFormatter(sys.stdout)
 reporter = Reporter(formatter)
 ExampleSuite.get_suite().run(reporter)
 
 # from future, import...
-# rgf script can create and run a runner
 # --> At this point we can start to break up the tests into multiple files :-)
 # Actually work out the language issues
 # rgf script returns non-zero exit status if any specs failed
