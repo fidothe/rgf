@@ -53,6 +53,10 @@ class ExampleSuite(object):
         cls.example_suite = ExampleSuite()
         return cls.example_suite
 
+    @classmethod
+    def set_suite(cls, suite):
+        cls.example_suite = suite
+
     def __init__(self):
         self.example_groups = []
         self.current_example_group_stack = [self]

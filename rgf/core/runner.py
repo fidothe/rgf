@@ -1,5 +1,5 @@
-import traceback, os, os.path, re, imp
-from rgf.core.examples import ExampleResult
+import traceback, os, os.path, re, imp, sys
+from rgf.core.examples import ExampleSuite, ExampleResult
 
 class ProgressFormatter(object):
     def __init__(self, io):
@@ -89,16 +89,65 @@ class Collector(object):
                     spec_files.append(os.path.join(path, name))
         return spec_files
 
-    def import_spec_file(self, path, root):
+    def _modularize_path(self, path, root):
         module_hierarchy_components = os.path.relpath(path, root).split(os.path.sep)
         last_mod, ext = os.path.splitext(module_hierarchy_components[-1])
         module_hierarchy_components[-1:] = [last_mod]
-        module_hierarchy_components[:0] = ['spec']
-        name = '.'.join(module_hierarchy_components)
+        return module_hierarchy_components
+
+    def _import_rgf_spec_module(self):
+        if not sys.modules.has_key('rgf'):
+            self._add_new_module('rgf')
+        if not sys.modules.has_key('rgf.spec'):
+            self._add_new_module('rgf.spec')
+
+    def _add_new_module(self, name):
+        mod = imp.new_module(name)
+        sys.modules[name] = mod
+
+    def _found_module_file(self, path, root):
+        return os.path.exists(os.path.join(root, path) + '.py')
+
+    def _found_package_file(self, path):
+        return os.path.exists(os.path.join(path, '__init__.py'))
+
+    def _load_package(self, module, path):
+        return self._load_module(name, os.path.join(path, '__init__.py'))
+
+    def _load_module(self, name, path):
+        imp.acquire_lock()
         with file(path) as f:
             mod = imp.load_module(name, f, path, ('.py', 'U', imp.PY_SOURCE))
+        imp.release_lock()
         return mod
 
-    def import_specs(self):
+    def _ensure_parents_loaded(self, prefix, components, root):
+        def module_path(mods, mod):
+            mods = mods + [mod]
+            current_module =  '.'.join([prefix] + mods)
+            current_path = os.path.join(root, *mods)
+            if not sys.modules.has_key(current_module):
+                if self._found_package_file(current_path):
+                    self._load_package(current_module, current_path)
+                else:
+                    self._add_new_module(current_module)
+            return mods
+        parents = components[:-1]
+        if len(parents) > 0:
+            reduce(module_path, parents, [])
+
+    def import_spec_file(self, path, root):
+        module_hierarchy_components = self._modularize_path(path, root)
+        self._ensure_parents_loaded('rgf.spec', module_hierarchy_components, root)
+        name = '.'.join(module_hierarchy_components)
+        mod = self._load_module('rgf.spec.' + name, path)
+        return mod
+
+    def import_spec_files(self):
+        self._import_rgf_spec_module()
         for spec_path in self.found_spec_files():
             self.import_spec_file(spec_path, self.start_path)
+
+    def collect_to(self, example_suite):
+        ExampleSuite.set_suite(example_suite)
+        self.import_spec_files()

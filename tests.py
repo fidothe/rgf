@@ -1,6 +1,6 @@
-import StringIO, sys, os.path
+import StringIO, sys, os.path, sets
 from rgf.core.examples import Example, ExampleGroup, ExampleSuite, ExampleResult
-from rgf.core.runner import ProgressFormatter, Reporter, Collector
+from rgf.core.runner import ProgressFormatter, Reporter, Collector, Runner
 from rgf.dsl import describe, it, before
 
 class MockExampleGroup(object):
@@ -16,8 +16,11 @@ class MockExample(object):
     pass
 
 class MockReporter(object):
+    def __init__(self):
+        self.examples_ran= []
+
     def example_ran(self, *args):
-        pass
+        self.examples_ran.append(args)
 
     def run_finished(self):
         self.run_finished_was_called = True
@@ -157,6 +160,12 @@ with describe('ExampleSuite'):
     def spec(world):
         assert type(ExampleSuite.get_suite()) is ExampleSuite
         assert ExampleSuite.get_suite() is ExampleSuite.get_suite()
+
+    @it('can set the ExampleSuite instance to be returned by get_suite()')
+    def f(w):
+        temp_suite = ExampleSuite()
+        ExampleSuite.set_suite(temp_suite)
+        assert ExampleSuite.get_suite() is temp_suite
 
     @it('can run run all its ExampleGroups')
     def spec(world):
@@ -328,36 +337,43 @@ with describe('Reporter'):
         assert type(world.mock_formatter.summarise_errors_called_with[0][1]) == ExampleResult
 
 with describe('Collector'):
+    @before
+    def b(w):
+        w.spec_file_path = os.path.abspath('spec/fixtures/sample_spec_dir/b/b_spec.py')
+        w.spec_root_path = os.path.abspath('spec/fixtures/sample_spec_dir')
+
     @it('can find spec files in a directory hierarchy')
     def f(w):
-        actual = Collector(os.path.abspath('spec/fixtures/sample_spec_dir')).found_spec_files()
+        actual = sets.Set(Collector(w.spec_root_path).found_spec_files())
         expected = ['a_spec.py', 'b/b_spec.py', 'c/d/d_spec.py']
-        expected = [os.path.abspath('spec/fixtures/sample_spec_dir/%s' % x) for x in expected]
-        actual.sort()
-        expected.sort()
+        expected = sets.Set(['%s/%s' % (w.spec_root_path, x) for x in expected])
         assert actual == expected
 
     @it('can import a spec file and collect its ExampleGroups')
     def f(w):
-        spec_file_path = os.path.abspath('spec/fixtures/sample_spec_dir/b/b_spec.py')
-        spec_root_path = os.path.abspath('spec/fixtures/sample_spec_dir')
         collector = Collector('/path/to/spec')
-        mod = collector.import_spec_file(spec_file_path, root = spec_root_path)
-        assert mod.__name__ == 'spec.b.b_spec'
-        assert mod.__file__.index(spec_file_path) == 0
+        mod = collector.import_spec_file(w.spec_file_path, root = w.spec_root_path)
+        assert mod.__name__ == 'rgf.spec.b.b_spec'
+        assert mod.__file__.index(w.spec_file_path) == 0
 
     @it('can import multiple spec files')
     def f(w):
-        spec_root_path = os.path.abspath('spec/fixtures/sample_spec_dir')
-        collector = Collector(spec_root_path)
+        collector = Collector(w.spec_root_path)
         imported_files = []
         def mock_import_file_func(path, root):
             imported_files.append(path)
         collector.import_spec_file = mock_import_file_func
-        collector.import_specs()
+        collector.import_spec_files()
         expected = ['a_spec.py', 'b/b_spec.py', 'c/d/d_spec.py']
-        expected = [os.path.abspath('spec/fixtures/sample_spec_dir/%s' % x) for x in expected]
+        expected = ['%s/%s' % (w.spec_root_path, x) for x in expected]
         assert imported_files == expected
+
+    @it('collects files to an ExampleSuite when it imports them')
+    def f(w):
+        collector = Collector(w.spec_root_path)
+        example_suite = ExampleSuite()
+        collector.collect_to(example_suite)
+        assert len(example_suite.example_groups) == 4
 
 formatter = ProgressFormatter(sys.stdout)
 reporter = Reporter(formatter)
