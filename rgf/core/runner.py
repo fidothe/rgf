@@ -160,3 +160,12 @@ class Runner(object):
         collector = Collector(path)
         collector.collect_to(suite)
         suite.run(self.reporter)
+
+def main():
+    formatter = ProgressFormatter(sys.stdout)
+    reporter = Reporter(formatter)
+    runner = Runner(reporter)
+    suite = ExampleSuite.get_suite()
+
+    runner.run(suite, sys.argv[1])
+

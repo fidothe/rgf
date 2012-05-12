@@ -387,7 +387,7 @@ with describe('Runner'):
 with describe('rgf script'):
     @it('can create and run a runner')
     def f(w):
-        p = subprocess.Popen('bin/rgf fixture_spec', shell = True, stdout = subprocess.PIPE)
+        p = subprocess.Popen('python rgf/cold_runner.py fixture_spec', shell = True, stdout = subprocess.PIPE)
         output, p_null = p.communicate()
         return_val = p.wait()
         assert return_val == 0
