@@ -339,8 +339,8 @@ with describe('Reporter'):
 with describe('Collector'):
     @before
     def b(w):
-        w.spec_file_path = os.path.abspath('spec/fixtures/sample_spec_dir/b/b_spec.py')
-        w.spec_root_path = os.path.abspath('spec/fixtures/sample_spec_dir')
+        w.spec_file_path = os.path.abspath('fixture_spec/b/b_spec.py')
+        w.spec_root_path = os.path.abspath('fixture_spec')
 
     @it('can find spec files in a directory hierarchy')
     def f(w):
@@ -381,13 +381,13 @@ with describe('Runner'):
         reporter = MockReporter()
         runner = Runner(reporter)
         suite = ExampleSuite()
-        runner.run(suite, 'spec/fixtures/sample_spec_dir')
+        runner.run(suite, 'fixture_spec')
         assert len(reporter.examples_ran) > 0
 
 with describe('rgf script'):
     @it('can create and run a runner')
     def f(w):
-        p = subprocess.Popen('bin/rgf spec/fixtures/sample_spec_dir', shell = True, stdout = subprocess.PIPE)
+        p = subprocess.Popen('bin/rgf fixture_spec', shell = True, stdout = subprocess.PIPE)
         output, p_null = p.communicate()
         return_val = p.wait()
         assert return_val == 0
