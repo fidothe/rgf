@@ -1,1 +1,10 @@
-v0.0.1, 2012-05-12 -- The so-how-does-pypi-work-then? release.
+0.0.2 (2012-05-13)
+==================
+
+- Anonymous module collection of specs using randomly-generated module names.
+  (fixes problems with imports of specs related to polluting ``sys.modules``)
+
+0.0.1 (2012-05-12)
+==================
+
+The so-how-does-pypi-work-then? release.
