@@ -6,6 +6,7 @@ A currently experimental attempt at an RSpec-esque BDD testing framework for Pyt
 Basically we're aiming for syntax along these lines:
 
 ::
+
     from rgf import describe, it
 
     with describe("That Thing"):
@@ -18,6 +19,7 @@ Basically we're aiming for syntax along these lines:
 root of your project and are run using:
 
 ::
+
     rgf spec
 
 
@@ -30,6 +32,7 @@ Because the spec functions are just functions, not methods, and are hoovered up 
 effectively anonymous and can all have the same name for ease of thinking:
 
 ::
+
     with subject('This Class'):
         @it('can calculate X')
         def s(world):
