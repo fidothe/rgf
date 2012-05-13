@@ -138,4 +138,3 @@ def main():
     suite = ExampleSuite.get_suite()
 
     runner.run(suite, sys.argv[1])
-
