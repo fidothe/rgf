@@ -352,9 +352,10 @@ with describe('Collector'):
     @it('can import a spec file and collect its ExampleGroups')
     def f(w):
         collector = Collector('/path/to/spec')
-        mod = collector.import_spec_file(w.spec_file_path, root = w.spec_root_path)
-        assert mod.__name__ == 'rgf.spec.b.b_spec'
-        assert mod.__file__.index(w.spec_file_path) == 0
+        root_module = 'rgf_anon_collector'
+        mod = collector.import_spec_file(w.spec_file_path, root_module)
+        assert re.compile(r'^%s\.spec_[0-9a-f]+$' % root_module).match(mod.__name__)
+        assert os.path.splitext(mod.__file__)[0] == os.path.splitext(w.spec_file_path)[0]
 
     @it('can import multiple spec files')
     def f(w):
