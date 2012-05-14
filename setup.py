@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-long_description = open('README.rst', 'r').read() + '\n\n' + open('CHANGELOG', 'r').read()
+long_description = open('README.rst', 'r').read() + '\nChangelog\n=========\n' + open('CHANGELOG', 'r').read()
 
 setup(name = 'rgf',
     version = '0.0.2',
