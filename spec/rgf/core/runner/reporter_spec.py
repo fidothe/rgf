@@ -1,5 +1,10 @@
 from rgf.dsl import describe, it, before
-import StringIO
+
+try:
+    from StringIO import BytesIO as StringIO
+except ImportError:
+    from io import StringIO
+
 from rgf.core.examples import ExampleSuite, ExampleGroup, Example, ExampleResult
 from rgf.core.runner import Reporter
 
@@ -45,7 +50,7 @@ with describe('Reporter'):
         example_group.add_example(world.ex1)
         example_group.add_example(world.ex2)
         example_group.add_example(world.ex3)
-        io = StringIO.StringIO()
+        io = StringIO()
         world.mock_formatter = MockFormatter()
         world.reporter = Reporter(world.mock_formatter)
         example_group.run(world.reporter)

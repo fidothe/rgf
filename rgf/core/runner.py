@@ -90,7 +90,7 @@ class Collector(object):
         return spec_files
 
     def _import_rgf_spec_module(self, name):
-        if not sys.modules.has_key(name):
+        if not name in sys.modules:
             self._add_new_module(name)
 
     def _add_new_module(self, name):
@@ -103,7 +103,7 @@ class Collector(object):
     def _load_module(self, path, spec_module_name):
         imp.acquire_lock()
         name = '%s.spec_%s' % (spec_module_name, uuid.uuid4().hex)
-        with file(path) as f:
+        with open(path) as f:
             mod = imp.load_module(name, f, path, ('.py', 'U', imp.PY_SOURCE))
         imp.release_lock()
         return mod

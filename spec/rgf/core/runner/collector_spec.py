@@ -1,5 +1,11 @@
 from rgf.dsl import describe, it, before
-import os, sets, re
+import os, re
+
+try:
+    from sets import Set as set
+except ImportError:
+    # `sets` module deprecated since 2.6
+    pass
 
 from rgf.core.runner import Collector
 from rgf.core.examples import ExampleSuite
@@ -12,9 +18,9 @@ with describe('Collector'):
 
     @it('can find spec files in a directory hierarchy')
     def f(w):
-        actual = sets.Set(Collector(w.spec_root_path).found_spec_files())
+        actual = set(Collector(w.spec_root_path).found_spec_files())
         expected = ['a_spec.py', 'b/b_spec.py', 'c/d/d_spec.py']
-        expected = sets.Set(['%s/%s' % (w.spec_root_path, x) for x in expected])
+        expected = set(['%s/%s' % (w.spec_root_path, x) for x in expected])
         assert actual == expected
 
     @it('can import a spec file and collect its ExampleGroups')

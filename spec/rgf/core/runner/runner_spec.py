@@ -33,7 +33,7 @@ with describe('rgf script'):
     @it('can create and run a runner')
     def f(w):
         return_val, output = run_spec_script('fixture_specs/success')
-        assert re.compile(r'4 examples').search(output) is not None
+        assert re.compile(r'4 examples'.encode('utf-8')).search(output) is not None
 
     @it('returns exit status 0 on a successful run')
     def f(w):
