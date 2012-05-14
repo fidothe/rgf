@@ -129,7 +129,11 @@ class Runner(object):
     def run(self, suite, path):
         collector = Collector(path)
         collector.collect_to(suite)
-        suite.run(self.reporter)
+        result = suite.run(self.reporter)
+        if result:
+            return 0
+        else:
+            return 1
 
 def main():
     formatter = ProgressFormatter(sys.stdout)
@@ -137,4 +141,4 @@ def main():
     runner = Runner(reporter)
     suite = ExampleSuite.get_suite()
 
-    runner.run(suite, sys.argv[1])
+    return runner.run(suite, sys.argv[1])

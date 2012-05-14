@@ -18,34 +18,46 @@ class MockReporter(object):
 def first_test_function(world):
     world.has_been_run = True
 
+def failing_test_function(world):
+    assert False
+
 def before_func(world):
     world.before_was_run = True
 
 with describe('ExampleGroup'):
+    @before
+    def b(w):
+        w.eg = ExampleGroup(MockExampleSuite(), "A group of Examples")
+        w.eg.add_example(Example('All good', first_test_function))
+        w.eg.add_example(Example('Still good', first_test_function))
+
     @it('can be created and described')
-    def spec(world):
-        eg = ExampleGroup(MockExampleSuite(), "A group of Examples")
-        assert eg.description == "A group of Examples"
+    def spec(w):
+        assert w.eg.description == "A group of Examples"
 
-        # Examples can be grouped and run together
-        eg = ExampleGroup(MockExampleSuite(), "")
-        eg.add_example(Example('All good', first_test_function))
-        eg.add_example(Example('Still good', first_test_function))
-        eg.run(MockReporter())
+    @it('can group Examples and run them together')
+    def spec(w):
+        w.eg.run(MockReporter())
 
-        assert eg.examples[0].has_been_run
-        assert eg.examples[1].has_been_run
+        assert w.eg.examples[0].has_been_run
+        assert w.eg.examples[1].has_been_run
 
     @it('can have setup code to be run before examples added')
-    def spec(world):
-        eg = ExampleGroup(MockExampleSuite(), '')
-        eg.add_example(Example('All good', first_test_function))
-        eg.add_example(Example('Still good', first_test_function))
-        eg.before(before_func)
-        eg.run(MockReporter())
+    def spec(w):
+        w.eg.before(before_func)
+        w.eg.run(MockReporter())
 
-        assert eg.examples[0].before_was_run
-        assert eg.examples[1].before_was_run
+        assert w.eg.examples[0].before_was_run
+        assert w.eg.examples[1].before_was_run
+
+    @it('returns True if all Examples success')
+    def spec(w):
+        assert w.eg.run(MockReporter()) is True
+
+    @it('returns False if any Examples fail')
+    def spec(w):
+        w.eg.add_example(Example('Not good', failing_test_function))
+        assert w.eg.run(MockReporter()) is False
 
 with describe('ExampleGroup context manager API'):
     @it('sets itself as the current example group in the suite on __enter__()')

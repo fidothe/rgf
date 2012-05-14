@@ -19,58 +19,64 @@ def before_func(world):
     world.before_was_run = True
 
 with describe('ExampleSuite'):
+    @before
+    def b(w):
+        w.suite = ExampleSuite()
+
     @it('can collect many ExampleGroups')
-    def spec(world):
-        suite = ExampleSuite()
-        example_group = suite.add_example_group('ExampleGroup description')
+    def spec(w):
+        example_group = w.suite.add_example_group('ExampleGroup description')
         assert type(example_group) is ExampleGroup
-        assert example_group in suite.example_groups
+        assert example_group in w.suite.example_groups
 
     @it('returns itself as the current ExampleGroup if there is none')
-    def spec(world):
-        suite = ExampleSuite()
-        assert suite.get_current_example_group() is suite
+    def spec(w):
+        assert w.suite.get_current_example_group() is w.suite
 
     @it('allows the current ExampleGroup to be set')
-    def spec(world):
-        suite = ExampleSuite()
-        example_group = suite.add_example_group('ExampleGroup description')
-        suite.set_current_example_group(example_group)
-        assert suite.get_current_example_group() is example_group
+    def spec(w):
+        example_group = w.suite.add_example_group('ExampleGroup description')
+        w.suite.set_current_example_group(example_group)
+        assert w.suite.get_current_example_group() is example_group
 
     @it('allows the current ExampleGroup to be popped off')
-    def spec(world):
-        suite = ExampleSuite()
-        example_group = suite.add_example_group('ExampleGroup description')
-        suite.set_current_example_group(example_group)
-        suite.pop_current_example_group()
-        assert suite.get_current_example_group() is suite
+    def spec(w):
+        example_group = w.suite.add_example_group('ExampleGroup description')
+        w.suite.set_current_example_group(example_group)
+        w.suite.pop_current_example_group()
+        assert w.suite.get_current_example_group() is w.suite
 
     @it('can create and return a single instance of itself')
-    def spec(world):
+    def spec(w):
         assert type(ExampleSuite.get_suite()) is ExampleSuite
         assert ExampleSuite.get_suite() is ExampleSuite.get_suite()
 
     @it('can set the ExampleSuite instance to be returned by get_suite()')
     def f(w):
-        temp_suite = ExampleSuite()
-        ExampleSuite.set_suite(temp_suite)
-        assert ExampleSuite.get_suite() is temp_suite
+        ExampleSuite.set_suite(w.suite)
+        assert ExampleSuite.get_suite() is w.suite
 
     @it('can run run all its ExampleGroups')
-    def spec(world):
-        example_suite = ExampleSuite()
-        example_group = example_suite.add_example_group('eg for explicit passing to it decorator')
+    def spec(w):
+        example_group = w.suite.add_example_group('eg for explicit passing to it decorator')
         @it('has explicit ExampleGroup', example_group = example_group)
         def f(world):
             world.has_been_run = True
 
-        example_suite.run(MockReporter())
+        w.suite.run(MockReporter())
         assert example_group.examples[0].has_been_run
 
     @it('tells the Reporter when the run has finished')
-    def spec(world):
-        example_suite = ExampleSuite()
+    def spec(w):
         reporter = MockReporter()
-        example_suite.run(reporter)
+        w.suite.run(reporter)
         assert reporter.run_finished_was_called
+
+    @it('returns True from run() if there were no failures')
+    def f(w):
+        example_group = w.suite.add_example_group('happy example group')
+        @it('succeeds', example_group = example_group)
+        def f(w):
+            pass
+        assert w.suite.run(MockReporter()) is True
+

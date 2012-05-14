@@ -31,9 +31,12 @@ class ExampleGroup(object):
         self.before_function = before_function
 
     def run(self, reporter):
+        all_examples_succeeded = True
         for example in self.examples:
             result = example.run(self)
+            if result.is_not_success(): all_examples_succeeded = False
             reporter.example_ran(example, result)
+        return all_examples_succeeded
 
     def run_before_each(self, example):
         if self.before_function:
@@ -76,8 +79,11 @@ class ExampleSuite(object):
         self.current_example_group_stack.pop()
 
     def run(self, reporter):
-        [example_group.run(reporter) for example_group in self.example_groups]
+        results = [example_group.run(reporter) for example_group in self.example_groups]
         reporter.run_finished()
+        def all_succeeded(start_state, current_state):
+            return start_state and current_state
+        return reduce(all_succeeded, results, True)
 
 class ExampleResult(object):
     SUCCESS = 1
@@ -100,3 +106,15 @@ class ExampleResult(object):
         self.kind = kind
         self.exception = exception
         self.traceback = traceback
+
+    def is_success(self):
+        return self.kind == self.SUCCESS
+
+    def is_failure(self):
+        return self.kind == self.FAILURE
+
+    def is_error(self):
+        return self.kind == self.ERROR
+
+    def is_not_success(self):
+        return self.kind != self.SUCCESS

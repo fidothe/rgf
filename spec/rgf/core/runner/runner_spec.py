@@ -39,3 +39,9 @@ with describe('rgf script'):
     def f(w):
         return_val, output = run_spec_script('fixture_specs/success')
         assert return_val == 0
+
+    @it('returns exit status 1 if there are failures')
+    def f(w):
+        return_val, output = run_spec_script('fixture_specs/failed')
+        assert return_val == 1
+

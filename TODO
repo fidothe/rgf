@@ -1,6 +1,4 @@
 # from future, import...
-# rgf script returns non-zero exit status if any specs failed
-# --> At this point we can be used by a CI bot :-)
 # ExampleGroups can be properly nested
 # before-functions are properly dealt with in nested contexts
 # Actually work out the language issues
