@@ -20,13 +20,13 @@ with describe('Runner'):
         reporter = MockReporter()
         runner = Runner(reporter)
         suite = ExampleSuite()
-        runner.run(suite, os.path.abspath(os.path.join(__file__, '../../../../../fixture_specs')))
+        runner.run(suite, os.path.abspath(os.path.join(__file__, '../../../../../fixture_specs/success')))
         assert len(reporter.examples_ran) > 0
 
 with describe('rgf script'):
     @it('can create and run a runner')
     def f(w):
-        p = subprocess.Popen('python rgf/cold_runner.py fixture_specs', shell = True, stdout = subprocess.PIPE)
+        p = subprocess.Popen('python rgf/cold_runner.py fixture_specs/success', shell = True, stdout = subprocess.PIPE)
         output, p_null = p.communicate()
         return_val = p.wait()
         assert return_val == 0

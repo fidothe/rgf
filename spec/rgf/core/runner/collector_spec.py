@@ -7,8 +7,8 @@ from rgf.core.examples import ExampleSuite
 with describe('Collector'):
     @before
     def b(w):
-        w.spec_file_path = os.path.abspath('fixture_specs/b/b_spec.py')
-        w.spec_root_path = os.path.abspath('fixture_specs')
+        w.spec_file_path = os.path.abspath('fixture_specs/success/b/b_spec.py')
+        w.spec_root_path = os.path.abspath('fixture_specs/success')
 
     @it('can find spec files in a directory hierarchy')
     def f(w):
