@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python rgf/cold_runner.py spec
+./cold_runner spec
