@@ -41,16 +41,3 @@ with describe('DSL'):
         decorator = it('has explicit ExampleGroup', example_group = example_group)
         example = decorator(first_test_function)
         assert example_group.examples == [example]
-
-# from future, import...
-# --> At this point we can start to break up the tests into multiple files :-)
-# Actually work out the language issues
-# rgf script returns non-zero exit status if any specs failed
-# --> At this point we can be used by a CI bot :-)
-# ExampleGroups can be properly nested
-# before-functions are properly dealt with in nested contexts
-# ProgressFormatter can output coloured dots if asked
-# DocumentationFormatter can output something like Rspec's specdoc format
-# formatter can be chosen by passing an arg to rgf
-# config can be extracted to a .rgf project file
-# --> At this point we're probably useful
