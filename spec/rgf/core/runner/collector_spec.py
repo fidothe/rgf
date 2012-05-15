@@ -40,8 +40,8 @@ with describe('Collector'):
         collector.import_spec_file = mock_import_file_func
         collector.import_spec_files()
         expected = ['a_spec.py', 'b/b_spec.py', 'c/d/d_spec.py']
-        expected = ['%s/%s' % (w.spec_root_path, x) for x in expected]
-        assert imported_files == expected, '%r != %r' % (imported_files, expected)
+        expected = set(['%s/%s' % (w.spec_root_path, x) for x in expected])
+        assert set(imported_files) == expected, '%r != %r' % (imported_files, expected)
 
     @it('collects files to an ExampleSuite when it imports them')
     def f(w):
