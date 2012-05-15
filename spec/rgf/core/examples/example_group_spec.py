@@ -83,3 +83,26 @@ with describe('ExampleGroup context manager API'):
         w.example_suite.set_current_example_group(example_group)
         example_group.__exit__(None, None, None)
         assert w.example_suite.get_current_example_group() is w.example_suite
+
+with describe('ExampleGroup nesting'):
+    @before
+    def b(w):
+        w.example_suite = ExampleSuite()
+
+    @it('allows an ExampleGroup to be added')
+    def s(w):
+        eg = w.example_suite.add_example_group('Parent EG')
+        child = eg.add_example_group('Child EG')
+        assert eg.example_groups == [child]
+
+    @it('can run run all its child ExampleGroups')
+    def spec(w):
+        eg = w.example_suite.add_example_group('Parent EG')
+        child = eg.add_example_group('Child EG')
+        @child.it('succeeds')
+        def f(w):
+            w.has_been_run = True
+
+        eg.run(MockReporter())
+        assert child.examples[0].has_been_run
+
