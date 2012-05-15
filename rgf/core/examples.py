@@ -56,6 +56,13 @@ class ExampleGroup(object):
     def __exit__(self, cls, value, traceback):
         self.parent.pop_current_example_group()
 
+    def it(self, description):
+        def example_creator(spec_function):
+            example = Example(description, spec_function)
+            self.add_example(example)
+            return example
+        return example_creator
+
 class ExampleSuite(object):
     @classmethod
     def get_suite(cls):

@@ -59,6 +59,13 @@ with describe('ExampleGroup'):
         w.eg.add_example(Example('Not good', failing_test_function))
         assert w.eg.run(MockReporter()) is False
 
+    @it('can generate a decorator around a new Example')
+    def s(w):
+        decorator = w.eg.it('Example description created by it()')
+        example = decorator(first_test_function)
+        assert example.description == 'Example description created by it()'
+        assert example in w.eg.examples
+
 with describe('ExampleGroup context manager API'):
     @it('sets itself as the current example group in the suite on __enter__()')
     def spec(world):

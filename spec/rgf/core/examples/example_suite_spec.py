@@ -58,8 +58,9 @@ with describe('ExampleSuite'):
 
     @it('can run run all its ExampleGroups')
     def spec(w):
-        example_group = w.suite.add_example_group('eg for explicit passing to it decorator')
-        @it('has explicit ExampleGroup', example_group = example_group)
+        w.suite.add_example_group('eg for explicit passing to it decorator')
+        example_group = w.suite.add_example_group('happy example group')
+        @example_group.it('succeeds')
         def f(world):
             world.has_been_run = True
 
@@ -75,7 +76,7 @@ with describe('ExampleSuite'):
     @it('returns True from run() if there were no failures')
     def f(w):
         example_group = w.suite.add_example_group('happy example group')
-        @it('succeeds', example_group = example_group)
+        @example_group.it('succeeds')
         def f(w):
             pass
         assert w.suite.run(MockReporter()) is True
