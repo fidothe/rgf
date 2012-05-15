@@ -34,7 +34,7 @@ with describe('Example'):
 
     @it('example reports its error if it exploded')
     def spec(world):
-        an_error = StandardError("An Error")
+        an_error = Exception("An Error")
         def bad_test_function(self):
             raise an_error
 

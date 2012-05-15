@@ -1,5 +1,12 @@
 import sys
 
+try:
+    # Python 3k
+    from functools import reduce
+except ImportError:
+    # Built in function in Python 2
+    pass
+
 class Example(object):
     def __init__(self, description, spec_function):
         self.spec_function = spec_function

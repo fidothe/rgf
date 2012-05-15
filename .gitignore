@@ -2,3 +2,4 @@
 .DS_Store
 rgf.egg-info/*
 dist/*
+.tox
