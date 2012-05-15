@@ -67,17 +67,19 @@ with describe('ExampleGroup'):
         assert example in w.eg.examples
 
 with describe('ExampleGroup context manager API'):
+    @before
+    def b(w):
+        w.example_suite = ExampleSuite()
+
     @it('sets itself as the current example group in the suite on __enter__()')
-    def spec(world):
-        example_suite = ExampleSuite()
-        example_group = ExampleGroup(example_suite, '__enter__ group')
+    def s(w):
+        example_group = ExampleGroup(w.example_suite, '__enter__ group')
         assert example_group.__enter__() is example_group
-        assert example_suite.get_current_example_group() is example_group
+        assert w.example_suite.get_current_example_group() is example_group
 
     @it('removes itself as the current example group on __exit__()')
-    def spec(world):
-        example_suite = ExampleSuite()
-        example_group = ExampleGroup(example_suite, '__exit__ group')
-        example_suite.set_current_example_group(example_group)
+    def s(w):
+        example_group = ExampleGroup(w.example_suite, '__exit__ group')
+        w.example_suite.set_current_example_group(example_group)
         example_group.__exit__(None, None, None)
-        assert example_suite.get_current_example_group() is example_suite
+        assert w.example_suite.get_current_example_group() is w.example_suite
