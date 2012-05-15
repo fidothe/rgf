@@ -1,7 +1,11 @@
 red / green / refactor
 ======================
 
-- CI on Travis: .. image:: https://secure.travis-ci.org/fidothe/rgf.png :alt: Build Status :target: http://travis-ci.org/fidothe/rgf
+.. image:: https://secure.travis-ci.org/fidothe/rgf.png 
+    :alt: Build Status 
+    :target: http://travis-ci.org/fidothe/rgf
+
+- CI on Travis: http://travis-ci.org/fidothe/rgf
 - Code on Github: https://github.com/fidothe/rgf
 - Package on PyPI: http://pypi.python.org/pypi/rgf
 
