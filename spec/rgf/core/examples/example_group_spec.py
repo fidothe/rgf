@@ -3,7 +3,13 @@ from rgf.dsl import describe, it, before
 from rgf.core.examples import ExampleGroup, ExampleSuite, Example
 
 class MockExampleSuite(object):
-    def run_before_each(self, example):
+    def set_current_example_group(self, example_group):
+        self.example_group_set = example_group
+
+    def pop_current_example_group(self):
+        self.example_group_popped = True
+
+    def run_before_each(self, world):
         pass
 
 class MockReporter(object):
@@ -120,3 +126,18 @@ with describe('ExampleGroup nesting'):
         assert w.child.examples[0].from_child == 2
         assert w.child.examples[0].from_parent == 1
 
+    @it("delegates set_current_example_group() to its parent for the use of describe")
+    def s(w):
+        mock_example_suite = MockExampleSuite()
+        example_group = ExampleGroup(mock_example_suite, 'describe delegation test group')
+
+        example_group.set_current_example_group(w.child)
+        assert mock_example_suite.example_group_set is w.child
+
+    @it("delegates pop_current_example_group() to its parent for the use of describe")
+    def s(w):
+        mock_example_suite = MockExampleSuite()
+        example_group = ExampleGroup(mock_example_suite, 'describe delegation test group')
+
+        example_group.pop_current_example_group()
+        assert mock_example_suite.example_group_popped

@@ -38,6 +38,12 @@ class ExampleGroup(object):
         if self.before_function:
             self.before_function(example)
 
+    def set_current_example_group(self, example_group):
+        self.parent.set_current_example_group(example_group)
+
+    def pop_current_example_group(self):
+        self.parent.pop_current_example_group()
+
     def __enter__(self):
         self.parent.set_current_example_group(self)
         return self
