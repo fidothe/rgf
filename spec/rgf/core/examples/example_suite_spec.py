@@ -67,6 +67,10 @@ with describe('ExampleSuite'):
         w.suite.run(MockReporter())
         assert example_group.examples[0].has_been_run
 
+    @it('implements run_before_each as a no-op, for ExampleGroup nesting')
+    def spec(w):
+        w.suite.run_before_each(None)
+
     @it('tells the Reporter when the run has finished')
     def spec(w):
         reporter = MockReporter()

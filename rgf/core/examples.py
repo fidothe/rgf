@@ -56,6 +56,7 @@ class ExampleGroup(object):
         return all_examples_succeeded
 
     def run_before_each(self, example):
+        self.parent.run_before_each(example)
         if self.before_function:
             self.before_function(example)
 
@@ -108,6 +109,9 @@ class ExampleSuite(object):
         def all_succeeded(start_state, current_state):
             return start_state and current_state
         return reduce(all_succeeded, results, True)
+
+    def run_before_each(self, example):
+        pass
 
 class ExampleResult(object):
     SUCCESS = 1

@@ -3,7 +3,8 @@ from rgf.dsl import describe, it, before
 from rgf.core.examples import ExampleGroup, ExampleSuite, Example
 
 class MockExampleSuite(object):
-    pass
+    def run_before_each(self, example):
+        pass
 
 class MockReporter(object):
     def __init__(self):
@@ -88,21 +89,34 @@ with describe('ExampleGroup nesting'):
     @before
     def b(w):
         w.example_suite = ExampleSuite()
+        w.parent = w.example_suite.add_example_group('Parent EG')
+        w.child = w.parent.add_example_group('Child EG')
 
     @it('allows an ExampleGroup to be added')
     def s(w):
-        eg = w.example_suite.add_example_group('Parent EG')
-        child = eg.add_example_group('Child EG')
-        assert eg.example_groups == [child]
+        assert w.parent.example_groups == [w.child]
 
     @it('can run run all its child ExampleGroups')
-    def spec(w):
-        eg = w.example_suite.add_example_group('Parent EG')
-        child = eg.add_example_group('Child EG')
-        @child.it('succeeds')
+    def s(w):
+        @w.child.it('succeeds')
         def f(w):
             w.has_been_run = True
 
-        eg.run(MockReporter())
-        assert child.examples[0].has_been_run
+        w.parent.run(MockReporter())
+        assert w.child.examples[0].has_been_run
+
+    @it("runs ancestor's before functions before its own")
+    def s(w):
+        @w.parent.before
+        def parent_before(w):
+            w.from_parent = 1
+        @w.child.before
+        def child_before(w):
+            w.from_child = 1 + w.from_parent
+        @w.child.it('succeeds')
+        def f(w):
+            pass
+        w.parent.run(MockReporter())
+        assert w.child.examples[0].from_child == 2
+        assert w.child.examples[0].from_parent == 1
 
