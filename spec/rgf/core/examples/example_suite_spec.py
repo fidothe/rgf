@@ -60,12 +60,13 @@ with describe('ExampleSuite'):
     def spec(w):
         w.suite.add_example_group('eg for explicit passing to it decorator')
         example_group = w.suite.add_example_group('happy example group')
+        state = {}
         @example_group.it('succeeds')
-        def f(world):
-            world.has_been_run = True
+        def f(w):
+            state['ran'] = True
 
         w.suite.run(MockReporter())
-        assert example_group.examples[0].has_been_run
+        assert state['ran']
 
     @it('implements run_before_each as a no-op, for ExampleGroup nesting')
     def spec(w):

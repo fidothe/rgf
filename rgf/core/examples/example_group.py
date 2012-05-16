@@ -2,12 +2,16 @@ import sys
 
 from .example import Example
 
+class ExampleContext(object):
+    pass
+
 class ExampleGroup(object):
     def __init__(self, parent, description):
         self.parent = parent
         self.examples = []
         self.example_groups = []
         self.description = description
+        self.world_factory = ExampleContext
         self.before_function = None
 
     def add_example(self, example):
@@ -24,7 +28,7 @@ class ExampleGroup(object):
     def run(self, reporter):
         all_examples_succeeded = True
         for example in self.examples:
-            result = example.run(self)
+            result = example.run(self, self.world_factory)
             if result.is_not_success(): all_examples_succeeded = False
             reporter.example_ran(example, result)
 

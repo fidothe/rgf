@@ -1,57 +1,68 @@
 from rgf.dsl import describe, it, before
 
-from rgf.core.examples import Example, ExampleResult
+from rgf.core.examples.example import Example
+from rgf.core.examples.example_result import ExampleResult
 
 class MockExampleGroup(object):
-    def run_before_each(self, example):
-        def before(eg):
-            eg.before_was_run = True
-        before(example)
+    def run_before_each(self, world):
+        world.before_was_run = True
 
-def first_test_function(world):
+class MockExampleContext(object):
+    pass
+
+def passing_spec_function(world):
     world.has_been_run = True
 
+def return_world(world):
+    def returner():
+        return world
+    return returner
+
 with describe('Example'):
-    @it('can be run')
-    def spec(world):
-        first_example = Example("can be run", first_test_function)
-        first_example.run(MockExampleGroup())
-        assert first_example.has_been_run
+    @before
+    def b(w):
+        w.mock_world = MockExampleContext()
+
+    @it('can be run with an isolated context')
+    def spec(w):
+        example = Example("can be run", passing_spec_function)
+        example.run(MockExampleGroup(), return_world(w.mock_world))
+        assert w.mock_world.has_been_run
 
     @it('is run with before func from context')
-    def spec(world):
-        second_example = Example("runs before method from context", first_test_function)
-        second_example.run(MockExampleGroup())
-        assert second_example.before_was_run
+    def spec(w):
+        example = Example("runs before method from context", passing_spec_function)
+        example.run(MockExampleGroup(), return_world(w.mock_world))
+        assert w.mock_world.before_was_run
 
     @it('example reports its success Successful')
-    def spec(world):
-        third_example = Example("reports success", first_test_function)
-        result = third_example.run(MockExampleGroup())
+    def spec(w):
+        example = Example("reports success", passing_spec_function)
+        result = example.run(MockExampleGroup(), return_world(w.mock_world))
         assert type(result) == ExampleResult
         assert result.kind == 1
         assert result.traceback is None
 
     @it('example reports its error if it exploded')
-    def spec(world):
+    def spec(w):
         an_error = Exception("An Error")
         def bad_test_function(self):
             raise an_error
 
-        third_example = Example("reports error", bad_test_function)
-        result = third_example.run(MockExampleGroup())
+        example = Example("reports error", bad_test_function)
+        result = example.run(MockExampleGroup(), return_world(w.mock_world))
         assert type(result) == ExampleResult
         assert result.exception is an_error
         assert result.traceback is not None
         assert result.kind == 3
 
     @it('reports its error on failure')
-    def spec(world):
+    def spec(w):
         def failed_test_function(self):
             assert False
 
-        fourth_example = Example("reports failure", failed_test_function)
-        result = fourth_example.run(MockExampleGroup())
+        example = Example("reports failure", failed_test_function)
+        result = example.run(MockExampleGroup(), return_world(w.mock_world))
         assert type(result) == ExampleResult
         assert type(result.exception) is AssertionError
         assert result.traceback is not None

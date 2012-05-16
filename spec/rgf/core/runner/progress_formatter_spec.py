@@ -10,11 +10,12 @@ from rgf.core.examples import Example
 
 class MockExampleGroup(object):
     def run_before_each(self, example):
-        def before(eg):
-            eg.before_was_run = True
-        before(example)
+        pass
 
 class MockExample(object):
+    pass
+
+def mock_world_factory():
     pass
 
 with describe('ProgressFormatter'):
@@ -59,7 +60,7 @@ with describe('ProgressFormatter summarising Failures and Errors'):
 
     @it('can summarise failures')
     def spec(world):
-        result = world.failing_example.run(MockExampleGroup())
+        result = world.failing_example.run(MockExampleGroup(), mock_world_factory)
         io = StringIO()
         pf = ProgressFormatter(io)
         pf.summarise_failures([(world.failing_example, result)])
@@ -67,7 +68,7 @@ with describe('ProgressFormatter summarising Failures and Errors'):
 
     @it('can summarise errors')
     def spec(world):
-        result = world.failing_example.run(MockExampleGroup())
+        result = world.failing_example.run(MockExampleGroup(), mock_world_factory)
         io = StringIO()
         pf = ProgressFormatter(io)
         pf.summarise_errors([(world.error_example, result)])

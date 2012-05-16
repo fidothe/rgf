@@ -7,10 +7,11 @@ class Example(object):
         self.spec_function = spec_function
         self.description = description
 
-    def run(self, example_group):
-        example_group.run_before_each(self)
+    def run(self, example_group, world_factory):
+        world = world_factory()
+        example_group.run_before_each(world)
         try:
-            self.spec_function(self)
+            self.spec_function(world)
             return ExampleResult.as_success()
         except AssertionError:
             exc_type, exc_value, exc_traceback = sys.exc_info()
