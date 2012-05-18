@@ -1,6 +1,4 @@
 # from future, import...
-# ExampleGroups can be properly nested
-# before-functions are properly dealt with in nested contexts
 # Actually work out the language issues
 # ProgressFormatter can output coloured dots if asked
 # DocumentationFormatter can output something like Rspec's specdoc format
