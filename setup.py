@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 import os, sys
 
 readme_text = open(os.path.join(os.path.dirname(__file__), 'README.rst'), 'r').read()
-changelog_text = open(os.path.join(os.path.dirname(__file__), 'CHANGELOG.'), 'r').read()
+changelog_text = open(os.path.join(os.path.dirname(__file__), 'CHANGELOG'), 'r').read()
 long_description = readme_text  + '\nChangelog\n=========\n' + changelog_text
 
 setup(name = 'rgf',
