@@ -8,7 +8,7 @@ changelog_text = open(os.path.join(os.path.dirname(__file__), 'CHANGELOG'), 'r')
 long_description = readme_text  + '\nChangelog\n=========\n' + changelog_text
 
 setup(name = 'rgf',
-    version = '0.2.0',
+    version = '0.2.0.1',
     description = 'rgf: red/green/refactor, a BDD framework for writing and running specs.',
     long_description = long_description,
     use_2to3=True,

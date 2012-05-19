@@ -1,3 +1,15 @@
+0.2.0.1 (2012-05-19)
+====================
+
+- bump to update the Changelog, which I had neglected to do for 0.2.0 (sorry)
+
+0.2.0 (2012-05-18)
+==================
+
+- Python 3 support, courtesy of Marc Abramowitz
+- create rgf and rgf-x.y scripts using distribute
+- ExampleGroups can be nested using ``with describe():``
+
 0.0.2 (2012-05-13)
 ==================
 
