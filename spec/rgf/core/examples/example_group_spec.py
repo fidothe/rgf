@@ -1,4 +1,4 @@
-from rgf.dsl import describe, it, before
+from rgf.dsl import *
 
 from rgf.core.examples import ExampleGroup, ExampleSuite, Example, ExampleContext
 
@@ -41,7 +41,7 @@ def failing_test_function(world):
 def before_func(world):
     world.before_was_run = True
 
-with describe('ExampleGroup'):
+with subject('ExampleGroup'):
     @before
     def b(w):
         w.example_suite = ExampleSuite()
@@ -63,7 +63,8 @@ with describe('ExampleGroup'):
     def spec(w):
         assert w.eg.world_factory == ExampleContext
 
-    with describe("running Examples"):
+    # with subject("running Examples"):
+    with subject("running Examples"):
         @before
         def b(w):
             w.worlds = []
@@ -107,7 +108,7 @@ with describe('ExampleGroup'):
         assert example.description == 'Example description created by it()'
         assert example in w.eg.examples
 
-    with describe('context manager API'):
+    with subject('context manager API'):
         @before
         def b(w):
             w.example_suite = ExampleSuite()
@@ -125,7 +126,7 @@ with describe('ExampleGroup'):
             example_group.__exit__(None, None, None)
             assert w.example_suite.get_current_example_group() is w.example_suite
 
-    with describe('nesting'):
+    with subject('nesting'):
         @before
         def b(w):
             w.worlds = []
