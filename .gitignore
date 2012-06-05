@@ -3,3 +3,4 @@
 rgf.egg-info/*
 dist/*
 .tox
+docs/_build/*
