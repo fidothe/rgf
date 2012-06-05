@@ -1,4 +1,4 @@
-from rgf.dsl import describe, it, before
+from rgf.dsl import *
 import os, re
 
 try:
@@ -10,21 +10,21 @@ except ImportError:
 from rgf.core.runner import Collector
 from rgf.core.examples import ExampleSuite
 
-with describe('Collector'):
+with subject('Collector'):
     @before
     def b(w):
         w.spec_file_path = os.path.abspath('fixture_specs/success/b/b_spec.py')
         w.spec_root_path = os.path.abspath('fixture_specs/success')
 
     @it('can find spec files in a directory hierarchy')
-    def f(w):
+    def s(w):
         actual = set(Collector(w.spec_root_path).found_spec_files())
         expected = ['a_spec.py', 'b/b_spec.py', 'c/d/d_spec.py']
         expected = set(['%s/%s' % (w.spec_root_path, x) for x in expected])
         assert actual == expected
 
     @it('can import a spec file and collect its ExampleGroups')
-    def f(w):
+    def s(w):
         collector = Collector('/path/to/spec')
         root_module = 'rgf_anon_collector'
         mod = collector.import_spec_file(w.spec_file_path, root_module)
@@ -32,7 +32,7 @@ with describe('Collector'):
         assert os.path.splitext(mod.__file__)[0] == os.path.splitext(w.spec_file_path)[0]
 
     @it('can import multiple spec files')
-    def f(w):
+    def s(w):
         collector = Collector(w.spec_root_path)
         imported_files = []
         def mock_import_file_func(path, root):
@@ -44,7 +44,7 @@ with describe('Collector'):
         assert set(imported_files) == expected, '%r != %r' % (imported_files, expected)
 
     @it('collects files to an ExampleSuite when it imports them')
-    def f(w):
+    def s(w):
         collector = Collector(w.spec_root_path)
         example_suite = ExampleSuite()
         collector.collect_to(example_suite)
