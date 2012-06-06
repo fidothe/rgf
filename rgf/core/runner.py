@@ -21,8 +21,11 @@ class ProgressFormatter(object):
     def error(self, example, example_result):
         self.write_status('E')
 
+    def run_finished(self, time_taken):
+        self.write_line('Run finished in %.5f seconds' % time_taken)
+
     def summarise_results(self, total, successes, failures, errors):
-        self.write_line('Ran %s examples: %s success, %s failure, %s error' % (total, successes, failures, errors))
+        self.write_line('%s examples: %s success, %s failure, %s error' % (total, successes, failures, errors))
 
     def summarise_failures_or_errors(self, failures_or_errors):
         for (example, example_result) in failures_or_errors:

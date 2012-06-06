@@ -40,12 +40,19 @@ with subject('ProgressFormatter'):
         pf.error(MockExample(), (3, None))
         assert io.getvalue() == 'E'
 
+    @it("can report that it's finished and how long it took")
+    def s(w):
+        io = StringIO()
+        pf = ProgressFormatter(io)
+        pf.run_finished(time_taken = 1.2)
+        assert io.getvalue() == 'Run finished in 1.20000 seconds\n'
+
     @it('can summarise the results of running all examples')
     def s(w):
         io = StringIO()
         pf = ProgressFormatter(io)
         pf.summarise_results(total = 3, successes = 1, failures = 1, errors = 1)
-        assert io.getvalue() == 'Ran 3 examples: 1 success, 1 failure, 1 error\n'
+        assert io.getvalue() == '3 examples: 1 success, 1 failure, 1 error\n'
 
     with context('summarising Failures and Errors'):
         @before
