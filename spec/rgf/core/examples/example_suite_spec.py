@@ -4,10 +4,13 @@ from rgf.core.examples import ExampleGroup, ExampleSuite
 
 class MockReporter(object):
     def __init__(self):
-        self.examples_ran= []
+        self.examples_ran = []
 
     def example_ran(self, *args):
         self.examples_ran.append(args)
+
+    def run_started(self):
+        self.run_started_was_called = True
 
     def run_finished(self):
         self.run_finished_was_called = True
@@ -71,6 +74,12 @@ with subject('ExampleSuite'):
     @it('implements run_before_each as a no-op, for ExampleGroup nesting')
     def s(w):
         w.suite.run_before_each(None)
+
+    @it('tells the Reporter when the run starts')
+    def s(w):
+        reporter = MockReporter()
+        w.suite.run(reporter)
+        assert reporter.run_started_was_called
 
     @it('tells the Reporter when the run has finished')
     def s(w):

@@ -1,4 +1,4 @@
-import traceback, os, os.path, re, imp, sys, uuid
+import traceback, os, os.path, re, imp, sys, uuid, time
 from rgf.core.examples import ExampleSuite, ExampleResult
 
 class ProgressFormatter(object):
@@ -22,6 +22,7 @@ class ProgressFormatter(object):
         self.write_status('E')
 
     def run_finished(self, time_taken):
+        self.write_line('')
         self.write_line('Run finished in %.5f seconds' % time_taken)
 
     def summarise_results(self, total, successes, failures, errors):
@@ -59,13 +60,21 @@ class Reporter(object):
         else:
             raise ValueError('Unrecognised Example result kind')
 
+    def run_started(self):
+        self.start_time = time.time()
+
     def run_finished(self):
+        self.end_time = time.time()
+        self.formatter.run_finished(self.run_time())
         self.formatter.summarise_results(self.total_number_of_examples(),
                 self.number_of_successes(), 
                 self.number_of_failures(),
                 self.number_of_errors())
         self.formatter.summarise_failures(self.failures)
         self.formatter.summarise_errors(self.errors)
+
+    def run_time(self):
+        return self.end_time - self.start_time
 
     def total_number_of_examples(self):
         return self.success_count + self.number_of_failures() + self.number_of_errors()

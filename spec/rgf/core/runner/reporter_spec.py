@@ -23,6 +23,9 @@ class MockFormatter(object):
     def error(self, example, result):
         self.errors.append(example)
 
+    def run_finished(self, *args):
+        pass
+
     def summarise_results(self, *args):
         self.summarise_results_called_with = args
 
@@ -43,7 +46,7 @@ with subject('Reporter'):
         def error_test_function(self):
             raise KeyError('grrr')
         example_suite = ExampleSuite()
-        example_group = ExampleGroup(example_suite, 'reports')
+        example_group = example_suite.add_example_group('reports')
         w.ex1 = Example('All good', first_test_function)
         w.ex2 = Example('Fail', failing_test_function)
         w.ex3 = Example('Error', error_test_function)
@@ -53,9 +56,9 @@ with subject('Reporter'):
         io = StringIO()
         w.mock_formatter = MockFormatter()
         w.reporter = Reporter(w.mock_formatter)
-        example_group.run(w.reporter)
+        example_suite.run(w.reporter)
 
-    @it('ExampleGroup.run reports its result')
+    @it('ExampleSuite.run reports its result')
     def s(w):
         assert w.mock_formatter.successes == [w.ex1]
         assert w.mock_formatter.failures == [w.ex2]
@@ -67,6 +70,10 @@ with subject('Reporter'):
         assert w.reporter.number_of_successes() == 1
         assert w.reporter.number_of_failures() == 1
         assert w.reporter.number_of_errors() == 1
+
+    @it('can report time taken')
+    def s(w):
+        assert w.reporter.run_time() > 0
 
     @it('uses its formatter to report status, summary and tracebacks for a run')
     def s(w):

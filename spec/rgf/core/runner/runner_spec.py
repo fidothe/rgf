@@ -14,6 +14,9 @@ class MockReporter(object):
     def run_finished(self):
         self.run_finished_was_called = True
 
+    def run_started(self):
+        pass
+
 with subject('Runner'):
     @it('can collect and run spec files through a Reporter')
     def f(w):

@@ -45,7 +45,7 @@ with subject('ProgressFormatter'):
         io = StringIO()
         pf = ProgressFormatter(io)
         pf.run_finished(time_taken = 1.2)
-        assert io.getvalue() == 'Run finished in 1.20000 seconds\n'
+        assert io.getvalue() == '\nRun finished in 1.20000 seconds\n'
 
     @it('can summarise the results of running all examples')
     def s(w):

@@ -37,6 +37,7 @@ class ExampleSuite(object):
         self.current_example_group_stack.pop()
 
     def run(self, reporter):
+        reporter.run_started()
         results = [example_group.run(reporter) for example_group in self.example_groups]
         reporter.run_finished()
         def all_succeeded(start_state, current_state):
